@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Foresticksv</title>
+    <!-- FAVICON W BASE64 – ZAWSZE DZIAŁA -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpUUqDnYQcchQnSyIijhKFYtgobQVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi5uak6CIl/i8ptIjx4Lgf7+497t4BQqPCVLNrAlA120gl4mImuyoGXxFEkACYRsLMZJ1JShLz8V0P99DdizMtzvtz9Kt5iwET8TzLTdMinide2HLUzuvEfWKRVYgWib8QbxJ0QeJ7rstO9pUZ/bXYRBaRCBLnSwVdLtctJSwVq5o4z7MCFSxmp1gkZkkyRbwqPiwROy1Mkhgvy3YyI2wi2YtYzKzLZavEcoJdkiUisRMnj0OIkVCxSxxGLHZcJwkiHYfxw3GSWCaJ4TgJEqMESXyGLz5P8V35eA3PqML4XIa1EacOYPj6cKpV08VvTtVRMkbwHXHcdfXzIK5XDqo66vEJGN8D7rq67lYEd9+Bjg9NsiX7UpCGli8A73fQGVN1z6EzJvp9ELwD+L9UbD0e3Ae9nfVby69PoAFupOs6MQAG3A0AAGsZVWJYCQAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAARnQU1BAACxjwv8YQUAAAMxSURBVHgB7VZtSFNRGP/ue+9mKTYXQigKJItJREFQH4T6EEhRBBFUYFAQRb0fCMmP0YciKoIKCqKg+BAERkEftI8iRAbSByPMPgixL2YitrZ5N83dPve997yzHTeVGdpz98Bvz33Pec55fs95noFLJJKQw+HgnE7nHMuyODMzM/Y6OzsrGhoaeP/z8fHxePfuHRwOBw/1xOFw/Ojr68sAcMjeDoC+i65pKWMVqG2Z5b2GAmMFKIZhSGVl5QFVVd8A2NHcAWDzO9+7kzG3H2YUM/YBx/kuEHqOeZ4njuPw+/sbGo2GLSkpob6+Ph+AjCDT0YpSis/nA8/zePv2LRKJBIAmY2pqajSAGSMqAiwyZzOlFGq1GoWFhSgrK0NjYyOcTifGxsYwPj6OqakpLC4uIhqNIhKJwOv1YnJycgtAzf0VqKioIAAyAT2IS1EUeDweJBIJXLp0Ca2trXC5XJidnYXD4UAymYTL5UJXVxcGBwf5cHd3N3+IxWJ/7qkA2AWVoklJkmBmZiYGBgZga2wEW1sLt9uNaDQKURQhCALKysrQ39+PVCoFTdNgNptRW1uLpqYmfH5+HpMnT2Jx4gPcT6/CrC9HSUkJamtrkZ+fz1NwOBxwu92QJCmzbWFhIZLJJERRRDQahdlsRkdHB3p7e/Hm5Qs0XL2O3M5OmM1mLK+qMEiSBNMGB1YcxzE6OkpPnDgBp9OJ1tZWzM3NoampCcFgEKIoYu/evXj48CFMJhPy8vLQ0dEBr9eL0tJS+Hw+6LoOQRBQUVGB48eP4/bt2yxN07R/Q0NDeL/+LwBZlpkmKVOtVhufnZ3dX1dXh3Q6jWAwiLa2NkQiEZjNZmSz2diyZQsmJyehqioikQjOnj2L6elpOJ1OOJ1ObN26FZlMBkajEadOncKjR484g8Fg3/BMZR0A0R2V/AkGg5N6vT5NCFlRVRWDg4Og62RXVxeSySSWlpbQ19eH9fV1SJKEdDqN2dlZZLNZpNNprKysIJPJQJZlrK2tIRQKQRRFlJWVYWRkJAlgZf0CkCFMNhsMhiXDMJwkSXoAiI6OjlbW19dj8/ilpSUEAgH+SYsikQg0TeOOWJaFwWAAIQS6riOZTPJyURQxPT29CQBmYwf39wD9BvxFxrF27zMqAAAAAElFTkSuQmCC">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body { background: #0a0a0a; color: #e0e0e0; display: flex; flex-direction: column; min-height: 100vh; }
+
+        .header {
+            background: #000000cc;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #cc0000;
+        }
+        .logo h1 { font-size: 1.8rem; color: #ff1a1a; cursor: pointer; }
+        .cart-icon {
+            background: #cc0000;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-count-badge { background: black; color: white; border-radius: 20px; padding: 0 8px; font-size: 0.8rem; }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #111;
+        }
+        .cat-btn {
+            background: transparent;
+            border: 1px solid #cc0000;
+            color: #eee;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .cat-btn.active { background: #cc0000; color: black; }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background: #121212;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #2c2c2c;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-5px); border-color: #cc0000; }
+        .product-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-info { padding: 1.2rem; }
+        .product-title { font-size: 1.2rem; font-weight: bold; }
+        .product-price { font-size: 1.5rem; color: #ff4d4d; margin: 0.5rem 0; }
+
+        .summary-view, .product-detail-view {
+            max-width: 1100px;
+            margin: 2rem auto;
+            background: #121212;
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid #cc0000;
+        }
+        .detail-main { display: flex; flex-wrap: wrap; gap: 2rem; }
+        .detail-images {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .detail-main-img {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .detail-main-img:hover { transform: scale(1.02); }
+        .gallery-nav {
+            position: absolute;
+            top: 45%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .gallery-prev { left: 10px; }
+        .gallery-next { right: 10px; }
+        .detail-thumbs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .detail-thumbs img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #333;
+            flex-shrink: 0;
+        }
+        .detail-thumbs img.active-thumb { border-color: #cc0000; }
+        .detail-info { flex: 1; min-width: 250px; }
+        .detail-title { font-size: 2rem; margin-bottom: 0.5rem; }
+        .detail-price { font-size: 2rem; color: #ff4d4d; margin: 1rem 0; }
+        .detail-desc { color: #bbb; line-height: 1.5; margin: 1rem 0; }
+        .detail-category { color: #cc0000; text-transform: uppercase; margin-bottom: 1rem; }
+        .add-to-cart-btn, .detail-ig-btn, .ig-btn {
+            display: block;
+            background: #cc0000;
+            color: black;
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 40px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #333;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e1e1e;
+            padding: 0.3rem;
+            border-radius: 30px;
+        }
+        .cart-item-quantity button {
+            background: #cc0000;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            text-align: right;
+            color: #ff4d4d;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ff6666;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        
+        /* STOPKA TYLKO NA STRONIE GŁÓWNEJ */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: #050505;
+            border-top: 1px solid #cc0000;
+            margin-top: auto;
+        }
+        .footer a { color: #ff6666; text-decoration: none; }
+        .footer p { margin: 0.5rem 0; }
+
+        .hidden { display: none; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+        }
+        .modal-content img {
+            width: auto;
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            font-size: 3rem;
+            padding: 0.2rem 0.8rem;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .modal-prev { left: -50px; }
+        .modal-next { right: -50px; }
+        @media (max-width: 700px) {
+            .header { flex-direction: column; text-align: center; }
+            .detail-title { font-size: 1.5rem; }
+            .gallery-nav { font-size: 1.5rem; padding: 0.2rem 0.5rem; }
+            .modal-nav { font-size: 2rem; }
+            .modal-prev { left: -30px; }
+            .modal-next { right: -30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo"><h1 id="homeBtn">FORESTICKSV</h1></div>
+    <div class="cart-icon" id="cartIcon">🛒 Koszyk <span id="cartCount" class="cart-count-badge">0</span></div>
+</div>
+
+<div id="shopView">
+    <div class="categories" id="categoriesContainer"></div>
+    <div class="products-grid" id="productsGrid"></div>
+    <!-- STOPKA – TYLKO NA STRONIE GŁÓWNEJ -->
+    <div class="footer">
+        <p>📧 foresticksv@darkwear.com</p>
+        <p>TikTok: <a href="https://www.tiktok.com/@foresticksv" target="_blank">@foresticksv</a></p>
+        <p>Instagram: <a href="https://www.instagram.com/foresticksvv/" target="_blank">@foresticksvv</a></p>
+    </div>
+</div>
+
+<div id="productDetailView" class="product-detail-view hidden">
+    <button id="backToShopFromDetail" class="back-btn">← Powrót do sklepu</button>
+    <div class="detail-main" id="productDetailContent"></div>
+</div>
+
+<div id="summaryView" class="summary-view hidden">
+    <h1>🛒 Podsumowanie zamówienia</h1>
+    <div id="cartItems"></div>
+    <div class="total" id="totalPrice"></div>
+    <button id="summaryIgBtn" class="ig-btn">📲 ZAMÓW PRZEZ INSTAGRAM (czat)</button>
+    <button id="backToShopBtn" class="back-btn">← Wróć do sklepu</button>
+</div>
+
+<!-- MODAL DO POWIĘKSZANIA ZDJĘĆ -->
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close">✖</button>
+        <button class="modal-nav modal-prev">‹</button>
+        <img id="modalImage" src="">
+        <button class="modal-nav modal-next">›</button>
+    </div>
+</div>
+
+<script>
+    const products = [
+        { 
+            id: 1, name: "Bluza SWETERKOWA OMN", category: "bluzy", price: 200, 
+            img: "https://i.imgur.com/mcSYjyA.jpeg",
+            images: [
+                "https://i.imgur.com/mcSYjyA.jpeg",
+                "https://i.imgur.com/mcSYjyA.jpeg",
+                "https://i.imgur.com/mcSYjyA.jpeg"
+            ],
+            desc: "Ręcznie szyta, długie rękawy, postrzępiony mankiet, fason balon. 90% bawełna, 10% poliester. Chodząca chmura."
+        },
+        { 
+            id: 2, name: "REVERSE BRUTAL spodnie", category: "spodnie dresowe", price: 200,
+            img: "https://i.imgur.com/dxPnCVg.jpeg",
+            images: ["https://i.imgur.com/dxPnCVg.jpeg"],
+            desc: "Krój balloon, czarna pętelka 470g, kieszenie tylne z brutalistycznym wzorem, szlufki na paski."
+        },
+        { 
+            id: 3, name: "AIRY top", category: "topy", price: 200,
+            img: "https://i.imgur.com/mB5r9LD.jpeg",
+            images: ["https://i.imgur.com/mB5r9LD.jpeg"],
+            desc: "94% bawełna, 6% poliester. Duże otwory pod pachami – wentylacja i podkreślenie LATS."
+        },
+        { 
+            id: 4, name: "Flared crop tee", category: "koszulki", price: 200,
+            img: "https://i.imgur.com/CwfpZ9a.jpeg",
+            images: ["https://i.imgur.com/CwfpZ9a.jpeg"],
+            desc: "Rozkloszowane rękawy, surowy dół. 100% bawełniany dżersej 300g/m²."
+        },
+        { 
+            id: 5, name: "Hibou Bande", category: "opaski", price: 200,
+            img: "https://i.imgur.com/jcMMjtd.jpeg",
+            images: ["https://i.imgur.com/jcMMjtd.jpeg"],
+            desc: "Opaska z zamkami w miejsce oczu, futro satynowe, kształt ptaka."
+        },
+        { 
+            id: 6, name: "Asymetryczna bluza", category: "bluzy", price: 200,
+            img: "https://i.imgur.com/Hvgtjk6.jpeg",
+            images: ["https://i.imgur.com/Hvgtjk6.jpeg"],
+            desc: "Cropped krój, sznurki regulowane, kaptur wizard, 340gsm przewiewna."
+        }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("forestCart")) || [];
+    let currentCategory = "wszystkie";
+    let currentProduct = null;
+    let currentImageIndex = 0;
+    let modalImageList = [];
+    let modalCurrentIndex = 0;
+
+    function saveCart() {
+        localStorage.setItem("forestCart", JSON.stringify(cart));
+        document.getElementById("cartCount").innerText = cart.reduce((s,i)=>s+i.quantity,0);
+    }
+
+    function updateQuantity(productId, newQuantity) {
+        if (newQuantity <= 0) cart = cart.filter(i => i.id !== productId);
+        else { let item = cart.find(i => i.id === productId); if (item) item.quantity = newQuantity; }
+        saveCart();
+        if (!document.getElementById("summaryView").classList.contains("hidden")) showSummary();
+    }
+
+    function addToCart(product, qty = 1) {
+        let existing = cart.find(i => i.id === product.id);
+        if (existing) existing.quantity += qty;
+        else cart.push({...product, quantity: qty});
+        saveCart();
+    }
+
+    function openModal(images, startIndex) {
+        modalImageList = images;
+        modalCurrentIndex = startIndex;
+        document.getElementById("modalImage").src = modalImageList[modalCurrentIndex];
+        document.getElementById("imageModal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("imageModal").classList.remove("active");
+    }
+
+    function modalPrev() {
+        modalCurrentIndex = (modalCurrentIndex - 1 + modalImageList.length) % modalImageList.length;
+        document.getElementById("modalImage").src = modalImageList[modalCurrentIndex];
+    }
+
+    function modalNext() {
+        modalCurrentIndex = (modalCurrentIndex + 1) % modalImageList.length;
+        document.getElementById("modalImage").src = modalImageList[modalCurrentIndex];
+    }
+
+    function showProductDetail(productId) {
+        currentProduct = products.find(p => p.id === productId);
+        currentImageIndex = 0;
+        document.getElementById("shopView").classList.add("hidden");
+        document.getElementById("summaryView").classList.add("hidden");
+        document.getElementById("productDetailView").classList.remove("hidden");
+        renderProductDetail();
+    }
+
+    function renderProductDetail() {
+        const container = document.getElementById("productDetailContent");
+        const imgList = currentProduct.images && currentProduct.images.length ? currentProduct.images : [currentProduct.img];
+        
+        container.innerHTML = `
+            <div class="detail-images">
+                <button class="gallery-nav gallery-prev">‹</button>
+                <img src="${imgList[currentImageIndex]}" class="detail-main-img" id="detailMainImg">
+                <button class="gallery-nav gallery-next">›</button>
+                <div class="detail-thumbs" id="detailThumbs">
+                    ${imgList.map((src, i) => `<img src="${src}" data-index="${i}" class="${i === currentImageIndex ? 'active-thumb' : ''}">`).join('')}
+                </div>
+            </div>
+            <div class="detail-info">
+                <div class="detail-category">${currentProduct.category.toUpperCase()}</div>
+                <div class="detail-title">${currentProduct.name}</div>
+                <div class="detail-price">${currentProduct.price} zł</div>
+                <div class="detail-desc">${currentProduct.desc}</div>
+                <button class="add-to-cart-btn" id="detailAddToCart">DODAJ DO KOSZYKA</button>
+                <button class="detail-ig-btn" id="detailOrderIg">📲 ZAMÓW PRZEZ INSTAGRAM</button>
+            </div>
+        `;
+        
+        const imgListFull = imgList;
+        const mainImg = document.getElementById("detailMainImg");
+        
+        mainImg.onclick = () => openModal(imgListFull, currentImageIndex);
+        
+        document.querySelector(".gallery-prev").onclick = () => {
+            currentImageIndex = (currentImageIndex - 1 + imgListFull.length) % imgListFull.length;
+            renderProductDetail();
+        };
+        document.querySelector(".gallery-next").onclick = () => {
+            currentImageIndex = (currentImageIndex + 1) % imgListFull.length;
+            renderProductDetail();
+        };
+        
+        document.querySelectorAll("#detailThumbs img").forEach(thumb => {
+            thumb.onclick = () => {
+                currentImageIndex = parseInt(thumb.dataset.index);
+                renderProductDetail();
+            };
+        });
+        
+        document.getElementById("detailAddToCart").onclick = () => { addToCart(currentProduct, 1); showSummary(); };
+        document.getElementById("detailOrderIg").onclick = () => {
+            let msg = `👕 *ZAMÓWIENIE Z FORESTICKSV*%0A%0A🖤 ${currentProduct.name} x1 = ${currentProduct.price} zł%0A%0A📦 Proszę o dane do wysyłki.`;
+            window.location.href = `https://www.instagram.com/direct/t/foresticksvv/?text=${msg}`;
+        };
+    }
+
+    function showSummary() {
+        document.getElementById("shopView").classList.add("hidden");
+        document.getElementById("productDetailView").classList.add("hidden");
+        document.getElementById("summaryView").classList.remove("hidden");
+        const itemsDiv = document.getElementById("cartItems"), totalSpan = document.getElementById("totalPrice"), igBtn = document.getElementById("summaryIgBtn");
+        if (cart.length === 0) { itemsDiv.innerHTML = "<p>Koszyk pusty.</p>"; totalSpan.innerHTML = "0 zł"; igBtn.style.display = "none"; return; }
+        let html = "", total = 0;
+        cart.forEach(item => {
+            let itTotal = item.price * item.quantity; total += itTotal;
+            html += `<div class="cart-item"><div><strong>${item.name}</strong></div>
+            <div class="cart-item-quantity"><button class="qty-minus" data-id="${item.id}">-</button><span>${item.quantity}</span><button class="qty-plus" data-id="${item.id}">+</button></div>
+            <div>${itTotal} zł</div><button class="remove-item-btn" data-id="${item.id}">🗑️</button></div>`;
+        });
+        itemsDiv.innerHTML = html; totalSpan.innerHTML = `${total} zł`; igBtn.style.display = "block";
+        document.querySelectorAll(".qty-plus").forEach(btn => { btn.onclick = () => { let id = parseInt(btn.dataset.id), it = cart.find(i=>i.id===id); if(it) updateQuantity(id, it.quantity+1); }; });
+        document.querySelectorAll(".qty-minus").forEach(btn => { btn.onclick = () => { let id = parseInt(btn.dataset.id), it = cart.find(i=>i.id===id); if(it && it.quantity>1) updateQuantity(id, it.quantity-1); else if(it) updateQuantity(id,0); }; });
+        document.querySelectorAll(".remove-item-btn").forEach(btn => { btn.onclick = () => { updateQuantity(parseInt(btn.dataset.id), 0); }; });
+        let msg = "👕 *NOWE ZAMÓWIENIE FORESTICKSV*%0A%0A"; cart.forEach(i => { msg += `🖤 ${i.name} x${i.quantity} = ${i.price*i.quantity} zł%0A`; });
+        msg += `%0A💰 RAZEM: ${total} zł%0A📦 Proszę o dane do wysyłki.`;
+        igBtn.onclick = () => window.location.href = `https://www.instagram.com/direct/t/foresticksvv/?text=${msg}`;
+    }
+
+    function showShop() {
+        document.getElementById("shopView").classList.remove("hidden");
+        document.getElementById("summaryView").classList.add("hidden");
+        document.getElementById("productDetailView").classList.add("hidden");
+        renderProducts();
+    }
+
+    function renderProducts() {
+        let filtered = products.filter(p => currentCategory === "wszystkie" || p.category === currentCategory);
+        document.getElementById("productsGrid").innerHTML = filtered.map(p => `
+            <div class="product-card" data-id="${p.id}"><div class="product-img"><img src="${p.img}"></div>
+            <div class="product-info"><div class="product-title">${p.name}</div><div class="product-price">${p.price} zł</div></div></div>
+        `).join("");
+        document.querySelectorAll(".product-card").forEach(card => { card.onclick = () => showProductDetail(parseInt(card.dataset.id)); });
+    }
+
+    let cats = ["wszystkie", ...new Set(products.map(p=>p.category))];
+    function renderCategories() {
+        let container = document.getElementById("categoriesContainer");
+        container.innerHTML = cats.map(cat => `<button class="cat-btn ${currentCategory===cat?'active':''}" data-cat="${cat}">${cat.toUpperCase()}</button>`).join("");
+        document.querySelectorAll(".cat-btn").forEach(btn => { btn.onclick = () => { currentCategory = btn.dataset.cat; renderCategories(); renderProducts(); }; });
+    }
+
+    document.getElementById("imageModal").onclick = (e) => { if (e.target === document.getElementById("imageModal")) closeModal(); };
+    document.querySelector(".modal-close").onclick = closeModal;
+    document.querySelector(".modal-prev").onclick = modalPrev;
+    document.querySelector(".modal-next").onclick = modalNext;
+    document.addEventListener("keydown", (e) => {
+        if (!document.getElementById("imageModal").classList.contains("active")) return;
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") modalPrev();
+        if (e.key === "ArrowRight") modalNext();
+    });
+
+    document.getElementById("homeBtn").onclick = () => showShop();
+    document.getElementById("cartIcon").onclick = () => showSummary();
+    document.getElementById("backToShopBtn").onclick = () => showShop();
+    document.getElementById("backToShopFromDetail").onclick = () => showShop();
+    renderCategories(); renderProducts(); saveCart();
+</script>
+</body>
+</html>
