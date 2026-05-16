@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Foresticksv</title>
-    <!-- FAVICON W BASE64 – ZAWSZE DZIAŁA -->
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpUUqDnYQcchQnSyIijhKFYtgobQVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi5uak6CIl/i8ptIjx4Lgf7+497t4BQqPCVLNrAlA120gl4mImuyoGXxFEkACYRsLMZJ1JShLz8V0P99DdizMtzvtz9Kt5iwET8TzLTdMinide2HLUzuvEfWKRVYgWib8QbxJ0QeJ7rstO9pUZ/bXYRBaRCBLnSwVdLtctJSwVq5o4z7MCFSxmp1gkZkkyRbwqPiwROy1Mkhgvy3YyI2wi2YtYzKzLZavEcoJdkiUisRMnj0OIkVCxSxxGLHZcJwkiHYfxw3GSWCaJ4TgJEqMESXyGLz5P8V35eA3PqML4XIa1EacOYPj6cKpV08VvTtVRMkbwHXHcdfXzIK5XDqo66vEJGN8D7rq67lYEd9+Bjg9NsiX7UpCGli8A73fQGVN1z6EzJvp9ELwD+L9UbD0e3Ae9nfVby69PoAFupOs6MQAG3A0AAGsZVWJYCQAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAARnQU1BAACxjwv8YQUAAAMxSURBVHgB7VZtSFNRGP/ue+9mKTYXQigKJItJREFQH4T6EEhRBBFUYFAQRb0fCMmP0YciKoIKCqKg+BAERkEftI8iRAbSByPMPgixL2YitrZ5N83dPve997yzHTeVGdpz98Bvz33Pec55fs95noFLJJKQw+HgnE7nHMuyODMzM/Y6OzsrGhoaeP/z8fHxePfuHRwOBw/1xOFw/Ojr68sAcMjeDoC+i65pKWMVqG2Z5b2GAmMFKIZhSGVl5QFVVd8A2NHcAWDzO9+7kzG3H2YUM/YBx/kuEHqOeZ4njuPw+/sbGo2GLSkpob6+Ph+AjCDT0YpSis/nA8/zePv2LRKJBIAmY2pqajSAGSMqAiwyZzOlFGq1GoWFhSgrK0NjYyOcTifGxsYwPj6OqakpLC4uIhqNIhKJwOv1YnJycgtAzf0VqKioIAAyAT2IS1EUeDweJBIJXLp0Ca2trXC5XJidnYXD4UAymYTL5UJXVxcGBwf5cHd3N3+IxWJ/7qkA2AWVoklJkmBmZiYGBgZga2wEW1sLt9uNaDQKURQhCALKysrQ39+PVCoFTdNgNptRW1uLpqYmfH5+HpMnT2Jx4gPcT6/CrC9HSUkJamtrkZ+fz1NwOBxwu92QJCmzbWFhIZLJJERRRDQahdlsRkdHB3p7e/Hm5Qs0XL2O3M5OmM1mLK+qMEiSBNMGB1YcxzE6OkpPnDgBp9OJ1tZWzM3NoampCcFgEKIoYu/evXj48CFMJhPy8vLQ0dEBr9eL0tJS+Hw+6LoOQRBQUVGB48eP4/bt2yxN07R/Q0NDeL/+LwBZlpkmKVOtVhufnZ3dX1dXh3Q6jWAwiLa2NkQiEZjNZmSz2diyZQsmJyehqioikQjOnj2L6elpOJ1OOJ1ObN26FZlMBkajEadOncKjR484g8Fg3/BMZR0A0R2V/AkGg5N6vT5NCFlRVRWDg4Og62RXVxeSySSWlpbQ19eH9fV1SJKEdDqN2dlZZLNZpNNprKysIJPJQJZlrK2tIRQKQRRFlJWVYWRkJAlgZf0CkCFMNhsMhiXDMJwkSXoAiI6OjlbW19dj8/ilpSUEAgH+SYsikQg0TeOOWJaFwWAAIQS6riOZTPJyURQxPT29CQBmYwf39wD9BvxFxrF27zMqAAAAAElFTkSuQmCC">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpUUqDnYQcchQnSyIijhKFYtgobQVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi5uak6CIl/i8ptIjx4Lgf7+497t4BQqPCVLNrAlA120gl4mImuyoGXxFEkACYRsLMZJ1JShLz8V0P99DdizMtzvtz9Kt5iwET8TzLTdMinide2HLUzuvEfWKRVYgWib8QbxJ0QeJ7rstO9pUZ/bXYRBaRCBLnSwVdLtctJSwVq5o4z7MCFSxmp1gkZkkyRbwqPiwROy1Mkhgvy3YyI2wi2YtYzKzLZavEcoJdkiUisRMnj0OIkVCxSxxGLHZcJwkiHYfxw3GSWCaJ4TgJEqMESXyGLz5P8V35eA3PqML4XIa1EacOYPj6cKpV08VvTtVRMkbwHXHcdfXzIK5XDqo66vEJGN8D7rq67lYEd9+Bjg9NsiX7UpCGli8A73fQGVN1z6EzJvp9ELwD+L9UbD0e3Ae9nfVby69PoAFupOs6MQAG3A0AAGsZVWJYCQAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAARnQU1BAACxjwv8YQUAAAMxSURBVHgB7VZtSFNRGP/ue+9mKTYXQigKJItJREFQH4T6EEhRBBFUYFAQRb0fCMmP0YciKoIKCqKg+BAERkEftI8iRAbSByPMPgixL2YitrZ5N83dPve997yzHTeVGdpz98Bvz33Pec55fs95noFLJJKQw+HgnE7nHMuyODMzM/Y6OzsrGhoaeP/z8fHxePfuHRwOBw/1xOFw/Ojr68sAcMjeDoC+i65pKWMVqG2Z5b2GAmMFKIZhSGVl5QFVVd8A2NHcAWDzO9+7kzG3H2YUM/YBx/kuEHqOeZ4njuPw+/sbGo2GLSkpob6+Ph+AjCDT0YpSis/nA8/zePv2LRKJBIAmY2pqajSAGSMqAiwyZzOlFGq1GoWFhSgrK0NjYyOcTifGxsYwPj6OqakpLC4uIhqNIhKJwOv1YnJycgtAzf0VqKioIAAyAT2IS1EUeDweJBIJXLp0Ca2trXC5XJidnYXD4UAymYTL5UJXVxcGBwf5cHd3N3+IxWJ/7qkA2AWVoklJkmBmZiYGBgZga2wEW1sLt9uNaDQKURQhCALKysrQ39+PVCoFTdNgNptRW1uLpqYmfH5+HpMnT2Jx4gPcT6/CrC9HSUkJamtrkZ+fz1NwOBxwu92QJCmzbWFhIZLJJERRRDQahdlsRkdHB3p7e/Hm5Qs0XL2O3M5OmM1mLK+qMEiSBNMGB1YcxzE6OkpPnDgBp9OJ1tZWzM3NoampCcFgEKIoYu/evXj48CFMJhPy8vLQ0dEBr9eL0tJS+Hw+6LoOQRBQUVGB48eP4/bt2yxN07R/Q0NDeL/+LwBZlpkmKVOtVhufnZ3dX1dXh3Q6jWAwiLa2NkQiEZjNZmSz2diyZQsmJyehqioikQjOnj2L6elpOJ1OOJ1ObN26FZlMBkajEadOncKjR484g8Fg3/BMZR0A0R2V/AkGg5N6vT5NCFlRVRWDg4Og62RXVxeSSSyWlpbQ19eH9fV1SJKEdDqN2dlZZLNZpNNprKysIJPJQJZlrK2tIRQKQRRFlJWVYWRkJAlgZf0CkCFMNhsMhiXDMJwkSXoAiI6OjlbW19dj8/ilpSUEAgH+SYsikQg0TeOOWJaFwWAAIQS6riOZTPJyURQxPT29CQBmYwf39wD9BvxFxrF27zMqAAAAAElFTkSuQmCC">
     <style>
         * {
             margin: 0;
@@ -200,7 +199,6 @@
             margin-top: 1rem;
         }
         
-        /* STOPKA TYLKO NA STRONIE GŁÓWNEJ */
         .footer {
             text-align: center;
             padding: 2rem;
@@ -213,7 +211,6 @@
 
         .hidden { display: none; }
 
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -285,7 +282,6 @@
 <div id="shopView">
     <div class="categories" id="categoriesContainer"></div>
     <div class="products-grid" id="productsGrid"></div>
-    <!-- STOPKA – TYLKO NA STRONIE GŁÓWNEJ -->
     <div class="footer">
         <p>📧 foresticksv@gmail.com</p>
         <p>TikTok: <a href="https://www.tiktok.com/@foresticksv" target="_blank">@foresticksv</a></p>
@@ -306,7 +302,6 @@
     <button id="backToShopBtn" class="back-btn">← Wróć do sklepu</button>
 </div>
 
-<!-- MODAL DO POWIĘKSZANIA ZDJĘĆ -->
 <div id="imageModal" class="modal">
     <div class="modal-content">
         <button class="modal-close">✖</button>
@@ -321,43 +316,14 @@
         { 
             id: 1, name: "Bluza SWETERKOWA OMN", category: "bluzy", price: 200, 
             img: "https://i.imgur.com/mcSYjyA.jpeg",
-            images: [
-                "https://i.imgur.com/mcSYjyA.jpeg",
-                "https://i.imgur.com/mcSYjyA.jpeg",
-                "https://i.imgur.com/mcSYjyA.jpeg"
-            ],
+            images: ["https://i.imgur.com/mcSYjyA.jpeg", "https://i.imgur.com/mcSYjyA.jpeg", "https://i.imgur.com/mcSYjyA.jpeg"],
             desc: "Ręcznie szyta, długie rękawy, postrzępiony mankiet, fason balon. 90% bawełna, 10% poliester. Chodząca chmura."
         },
-        { 
-            id: 2, name: "REVERSE BRUTAL spodnie", category: "spodnie dresowe", price: 200,
-            img: "https://i.imgur.com/dxPnCVg.jpeg",
-            images: ["https://i.imgur.com/dxPnCVg.jpeg"],
-            desc: "Krój balloon, czarna pętelka 470g, kieszenie tylne z brutalistycznym wzorem, szlufki na paski."
-        },
-        { 
-            id: 3, name: "AIRY top", category: "topy", price: 200,
-            img: "https://i.imgur.com/mB5r9LD.jpeg",
-            images: ["https://i.imgur.com/mB5r9LD.jpeg"],
-            desc: "94% bawełna, 6% poliester. Duże otwory pod pachami – wentylacja i podkreślenie LATS."
-        },
-        { 
-            id: 4, name: "Flared crop tee", category: "koszulki", price: 200,
-            img: "https://i.imgur.com/CwfpZ9a.jpeg",
-            images: ["https://i.imgur.com/CwfpZ9a.jpeg"],
-            desc: "Rozkloszowane rękawy, surowy dół. 100% bawełniany dżersej 300g/m²."
-        },
-        { 
-            id: 5, name: "Hibou Bande", category: "opaski", price: 200,
-            img: "https://i.imgur.com/jcMMjtd.jpeg",
-            images: ["https://i.imgur.com/jcMMjtd.jpeg"],
-            desc: "Opaska z zamkami w miejsce oczu, futro satynowe, kształt ptaka."
-        },
-        { 
-            id: 6, name: "Asymetryczna bluza", category: "bluzy", price: 200,
-            img: "https://i.imgur.com/Hvgtjk6.jpeg",
-            images: ["https://i.imgur.com/Hvgtjk6.jpeg"],
-            desc: "Cropped krój, sznurki regulowane, kaptur wizard, 340gsm przewiewna."
-        }
+        { id: 2, name: "REVERSE BRUTAL spodnie", category: "spodnie dresowe", price: 200, img: "https://i.imgur.com/dxPnCVg.jpeg", images: ["https://i.imgur.com/dxPnCVg.jpeg"], desc: "Krój balloon, czarna pętelka 470g, kieszenie tylne z brutalistycznym wzorem." },
+        { id: 3, name: "AIRY top", category: "topy", price: 200, img: "https://i.imgur.com/mB5r9LD.jpeg", images: ["https://i.imgur.com/mB5r9LD.jpeg"], desc: "94% bawełna, 6% poliester. Duże otwory pod pachami." },
+        { id: 4, name: "Flared crop tee", category: "koszulki", price: 200, img: "https://i.imgur.com/CwfpZ9a.jpeg", images: ["https://i.imgur.com/CwfpZ9a.jpeg"], desc: "Rozkloszowane rękawy, surowy dół. 100% bawełna." },
+        { id: 5, name: "Hibou Bande", category: "opaski", price: 200, img: "https://i.imgur.com/jcMMjtd.jpeg", images: ["https://i.imgur.com/jcMMjtd.jpeg"], desc: "Opaska z zamkami w miejsce oczu, futro satynowe." },
+        { id: 6, name: "Asymetryczna bluza", category: "bluzy", price: 200, img: "https://i.imgur.com/Hvgtjk6.jpeg", images: ["https://i.imgur.com/Hvgtjk6.jpeg"], desc: "Cropped krój, sznurki regulowane, kaptur wizard." }
     ];
 
     let cart = JSON.parse(localStorage.getItem("forestCart")) || [];
@@ -393,19 +359,9 @@
         document.getElementById("imageModal").classList.add("active");
     }
 
-    function closeModal() {
-        document.getElementById("imageModal").classList.remove("active");
-    }
-
-    function modalPrev() {
-        modalCurrentIndex = (modalCurrentIndex - 1 + modalImageList.length) % modalImageList.length;
-        document.getElementById("modalImage").src = modalImageList[modalCurrentIndex];
-    }
-
-    function modalNext() {
-        modalCurrentIndex = (modalCurrentIndex + 1) % modalImageList.length;
-        document.getElementById("modalImage").src = modalImageList[modalCurrentIndex];
-    }
+    function closeModal() { document.getElementById("imageModal").classList.remove("active"); }
+    function modalPrev() { modalCurrentIndex = (modalCurrentIndex - 1 + modalImageList.length) % modalImageList.length; document.getElementById("modalImage").src = modalImageList[modalCurrentIndex]; }
+    function modalNext() { modalCurrentIndex = (modalCurrentIndex + 1) % modalImageList.length; document.getElementById("modalImage").src = modalImageList[modalCurrentIndex]; }
 
     function showProductDetail(productId) {
         currentProduct = products.find(p => p.id === productId);
@@ -419,7 +375,6 @@
     function renderProductDetail() {
         const container = document.getElementById("productDetailContent");
         const imgList = currentProduct.images && currentProduct.images.length ? currentProduct.images : [currentProduct.img];
-        
         container.innerHTML = `
             <div class="detail-images">
                 <button class="gallery-nav gallery-prev">‹</button>
@@ -438,33 +393,13 @@
                 <button class="detail-ig-btn" id="detailOrderIg">📲 ZAMÓW PRZEZ INSTAGRAM</button>
             </div>
         `;
-        
         const imgListFull = imgList;
-        const mainImg = document.getElementById("detailMainImg");
-        
-        mainImg.onclick = () => openModal(imgListFull, currentImageIndex);
-        
-        document.querySelector(".gallery-prev").onclick = () => {
-            currentImageIndex = (currentImageIndex - 1 + imgListFull.length) % imgListFull.length;
-            renderProductDetail();
-        };
-        document.querySelector(".gallery-next").onclick = () => {
-            currentImageIndex = (currentImageIndex + 1) % imgListFull.length;
-            renderProductDetail();
-        };
-        
-        document.querySelectorAll("#detailThumbs img").forEach(thumb => {
-            thumb.onclick = () => {
-                currentImageIndex = parseInt(thumb.dataset.index);
-                renderProductDetail();
-            };
-        });
-        
+        document.getElementById("detailMainImg").onclick = () => openModal(imgListFull, currentImageIndex);
+        document.querySelector(".gallery-prev").onclick = () => { currentImageIndex = (currentImageIndex - 1 + imgListFull.length) % imgListFull.length; renderProductDetail(); };
+        document.querySelector(".gallery-next").onclick = () => { currentImageIndex = (currentImageIndex + 1) % imgListFull.length; renderProductDetail(); };
+        document.querySelectorAll("#detailThumbs img").forEach(thumb => { thumb.onclick = () => { currentImageIndex = parseInt(thumb.dataset.index); renderProductDetail(); }; });
         document.getElementById("detailAddToCart").onclick = () => { addToCart(currentProduct, 1); showSummary(); };
-        document.getElementById("detailOrderIg").onclick = () => {
-            let msg = `👕 *ZAMÓWIENIE Z FORESTICKSV*%0A%0A🖤 ${currentProduct.name} x1 = ${currentProduct.price} zł%0A%0A📦 Proszę o dane do wysyłki.`;
-            window.location.href = `https://www.instagram.com/direct/t/foresticksvv/?text=${msg}`;
-        };
+        document.getElementById("detailOrderIg").onclick = () => { let msg = `👕 *ZAMÓWIENIE Z FORESTICKSV*%0A%0A🖤 ${currentProduct.name} x1 = ${currentProduct.price} zł%0A%0A📦 Proszę o dane do wysyłki.`; window.location.href = `https://www.instagram.com/direct/t/foresticksvv/?text=${msg}`; };
     }
 
     function showSummary() {
@@ -498,10 +433,7 @@
 
     function renderProducts() {
         let filtered = products.filter(p => currentCategory === "wszystkie" || p.category === currentCategory);
-        document.getElementById("productsGrid").innerHTML = filtered.map(p => `
-            <div class="product-card" data-id="${p.id}"><div class="product-img"><img src="${p.img}"></div>
-            <div class="product-info"><div class="product-title">${p.name}</div><div class="product-price">${p.price} zł</div></div></div>
-        `).join("");
+        document.getElementById("productsGrid").innerHTML = filtered.map(p => `<div class="product-card" data-id="${p.id}"><div class="product-img"><img src="${p.img}"></div><div class="product-info"><div class="product-title">${p.name}</div><div class="product-price">${p.price} zł</div></div></div>`).join("");
         document.querySelectorAll(".product-card").forEach(card => { card.onclick = () => showProductDetail(parseInt(card.dataset.id)); });
     }
 
