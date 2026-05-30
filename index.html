@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        // Inicjalizacja EmailJS - OD RAZU
-        (function() {
-            emailjs.init("2T9D7EvliIOPsZn9G");
-        })();
+     
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -391,7 +386,16 @@
                         <div class="footer-col"><h4>OBSERWUJ NAS</h4><ul><li><a href="https://www.instagram.com/foresticksvv/" target="_blank">📸 INSTAGRAM</a></li><li><a href="https://www.tiktok.com/@foresticksv" target="_blank">🎵 TIKTOK</a></li><li><a href="#" id="contactAddressLink">📍 RZESZOW, UL. 3 MAJA 15</a></li></ul></div>
                         <div class="footer-col"><h4>INFORMACJE</h4><ul><li><a href="#" id="helpCenterLink">CENTRUM POMOCY</a></li><li><a href="#" id="shippingPolicyLink">POLITYKA WYSYLKI</a></li><li><a href="#" id="returnsPolicyLink">ZWROTY</a></li><li><a href="#" id="contactFooterLink">KONTAKT</a></li></ul></div>
                         <div class="footer-col"><h4>REGULAMINY</h4><ul><li><a href="#" id="imprintLink">IMPRINT</a></li><li><a href="#" id="privacyPolicyLink">POLITYKA PRYWATNOSCI</a></li><li><a href="#" id="termsLink">REGULAMIN SKLEPU</a></li></ul></div>
-                        <div class="footer-col"><h4>ZAPISZ SIE</h4><form class="signup-form" id="newsletterForm"><input type="email" placeholder="TWOJ EMAIL" required><button type="submit">ZAPISZ SIE</button></form></div>
+                       <div class="footer-col">
+    <h4>ZAPISZ SIE</h4>
+    <form action="https://formsubmit.co/foresticksv@gmail.com" method="POST" class="signup-form">
+        <input type="email" name="email" placeholder="TWOJ EMAIL" required>
+        <input type="hidden" name="_subject" value="NOWY SUBSKRYBENT!">
+        <input type="hidden" name="_captcha" value="false">
+       <input type="hidden" name="_next" value="https://foresticksv.github.io/strona/">
+          <button type="submit">ZAPISZ SIE</button>
+    </form>
+</div>
                     </div>
                     <div class="copyright">© 2025 FORESTICKSV. DARKWEAR STREETWEAR | CHATBOT 24/7</div>
                 </div>
@@ -771,46 +775,7 @@
         
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
 
-        // ========== NEWSLETTER ==========
-        document.addEventListener("DOMContentLoaded", function() {
-            const newsletterForm = document.getElementById("newsletterForm");
-            if(newsletterForm) {
-                newsletterForm.addEventListener("submit", function(e) {
-                    e.preventDefault();
-                    
-                    const emailInput = newsletterForm.querySelector("input");
-                    const email = emailInput.value;
-                    
-                    if(!email || !email.includes("@")) {
-                        alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
-                        return;
-                    }
-                    
-                    const btn = newsletterForm.querySelector("button");
-                    const originalText = btn.innerText;
-                    btn.innerText = "WYSYLANIE...";
-                    btn.disabled = true;
-                    
-                    emailjs.send("service_430hmn3", "template_znsd91r", {
-                        to_email: email,
-                        email: email,
-                        name: email.split("@")[0]
-                    })
-                    .then(function() {
-                        alert("✅ DZIEKUJEMY! KOD WYSLANY NA " + email);
-                        emailInput.value = "";
-                    })
-                    .catch(function(error) {
-                        console.error(error);
-                        alert("❌ BLAD: " + (error.text || "Nieznany blad"));
-                    })
-                    .finally(function() {
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                    });
-                });
-            }
-        });
+       
     </script>
 </body>
 </html>
