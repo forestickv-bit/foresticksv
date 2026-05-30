@@ -389,14 +389,14 @@
                        <div class="footer-col">
                       <div class="footer-col">
                         <h4>ZAPISZ SIE</h4>
-                    <form action="https://formsubmit.co/forestickv@gmail.com" method="POST" class="signup-form">
+          
                   <input type="email" name="email" placeholder="TWOJ EMAIL" required>
                 <input type="hidden" name="_subject" value="NOWY SUBSKRYBENT NEWSLETTERA FORESTICKSV!">
                  <input type="hidden" name="_captcha" value="false">
                  <input type="hidden" name="_next" value="https://forestickv-bit.github.io/foresticksv/dziekuje.html">
                          <input type="hidden" name="_template" value="table">
-                 <button type="submit">ZAPISZ SIE</button>
-                    </form>
+                <button type="submit">ZAPISZ SIE</button>
+            
                     </div>
                     </div>
                     <div class="copyright">© 2025 FORESTICKSV. DARKWEAR STREETWEAR | CHATBOT 24/7</div>
@@ -776,8 +776,52 @@
         setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
         
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
+<script>
+       // ========== EMAILJS - NEWSLETTER ==========
+const EMAILJS_PUBLIC_KEY = "2T9D7EvliIOPsZn9G";
+const EMAILJS_SERVICE_ID = "service_430hmn3";
+const EMAILJS_TEMPLATE_ID = "template_znsd91r";
 
-       
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+const newsletterForm = document.getElementById("newsletterForm");
+if(newsletterForm) {
+    newsletterForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const emailInput = newsletterForm.querySelector("input[type='email']");
+        const email = emailInput?.value.trim();
+        
+        if(!email || !email.includes("@")) {
+            alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
+            return;
+        }
+        
+        const submitBtn = newsletterForm.querySelector("button");
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = "⏳ WYSYLANIE...";
+        submitBtn.disabled = true;
+        
+        try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                email: email,
+                name: email.split("@")[0],
+                discount_code: "FOREST10"
+            });
+            
+            alert(`✅ DZIEKUJEMY!\n\nKod rabatowy -10% zostal wyslany na ${email}\nSPRAWDZ FOLDER SPAM!`);
+            emailInput.value = "";
+            
+        } catch(error) {
+            console.error("EmailJS Error:", error);
+            alert("❌ BLAD WYSYLANIA!\n\nSprawdz polaczenie z internetem.");
+        } finally {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+</script>
     </script>
 </body>
 </html>
