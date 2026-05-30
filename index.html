@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Foresticksv - Darkwear Store | Chatbot 24/7</title>
@@ -756,6 +757,62 @@
         setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
         
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
+    // ========== NEWSLETTER Z EMAILJS ==========
+(function() {
+    // ZAMIEN NA SWOJ PUBLIC KEY Z EMAILJS
+    emailjs.init("TWOJ_PUBLIC_KEY");
+})();
+
+// Obsluga formularza newslettera
+const newsletterForm = document.getElementById("newsletterForm");
+if(newsletterForm) {
+    newsletterForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const emailInput = newsletterForm.querySelector("input[type='email']");
+        const email = emailInput?.value;
+        
+        if(!email || !email.includes("@")) {
+            alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
+            return;
+        }
+        
+        const submitBtn = newsletterForm.querySelector("button");
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = "WYSYLANIE...";
+        submitBtn.disabled = true;
+        
+        try {
+            // ZAMIEN NA SWOJE DANE
+            await emailjs.send(
+                "service_430hmn3",           // TWOJ SERVICE ID
+                "TWOJ_TEMPLATE_ID",          // TWOJ TEMPLATE ID
+                {
+                    email: email,
+                    name: email.split("@")[0]
+                }
+            );
+            
+            alert(`✅ DZIEKUJEMY ZA ZAPIS!\n\nNa adres ${email} wyslalismy kod rabatowy -10%\nSPRAWDZ FOLDER SPAM!`);
+            emailInput.value = "";
+            
+            // Zapisz w localStorage
+            let subscribers = JSON.parse(localStorage.getItem("newsletterSubscribers")) || [];
+            if(!subscribers.includes(email)) {
+                subscribers.push(email);
+                localStorage.setItem("newsletterSubscribers", JSON.stringify(subscribers));
+            }
+            
+        } catch(error) {
+            console.error("EmailJS Error:", error);
+            alert(`❌ BLAD WYSYLANIA!\n\nSprawdz czy dobrze wpisales:\n- Public Key\n- Service ID\n- Template ID`);
+        } finally {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
     </script>
+
 </body>
 </html>
