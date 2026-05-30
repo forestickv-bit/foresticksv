@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // Inicjalizacja EmailJS - OD RAZU
+        (function() {
+            emailjs.init("2T9D7EvliIOPsZn9G");
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Foresticksv - Darkwear Store | Chatbot 24/7</title>
@@ -765,50 +771,47 @@
         
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
 
-    // Inicjalizacja EmailJS
-    emailjs.init("2T9D7EvliIOPsZn9G");
-    
-    // Obsługa formularza newslettera
-    const newsletterForm = document.getElementById("newsletterForm");
-    if(newsletterForm) {
-        newsletterForm.addEventListener("submit", function(event) {
-            event.preventDefault();
-            
-            const emailInput = this.querySelector('input[type="email"]');
-            const email = emailInput.value;
-            
-            if(!email || email.indexOf("@") === -1) {
-                alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
-                return;
+<script>
+        // ========== NEWSLETTER ==========
+        document.addEventListener("DOMContentLoaded", function() {
+            const newsletterForm = document.getElementById("newsletterForm");
+            if(newsletterForm) {
+                newsletterForm.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    
+                    const emailInput = newsletterForm.querySelector("input");
+                    const email = emailInput.value;
+                    
+                    if(!email || !email.includes("@")) {
+                        alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
+                        return;
+                    }
+                    
+                    const btn = newsletterForm.querySelector("button");
+                    const originalText = btn.innerText;
+                    btn.innerText = "WYSYLANIE...";
+                    btn.disabled = true;
+                    
+                    emailjs.send("service_430hmn3", "template_znsd91r", {
+                        to_email: email,
+                        email: email,
+                        name: email.split("@")[0]
+                    })
+                    .then(function() {
+                        alert("✅ DZIEKUJEMY! KOD WYSLANY NA " + email);
+                        emailInput.value = "";
+                    })
+                    .catch(function(error) {
+                        console.error(error);
+                        alert("❌ BLAD: " + (error.text || "Nieznany blad"));
+                    })
+                    .finally(function() {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    });
+                });
             }
-            
-            const submitBtn = this.querySelector("button");
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = "WYSYLANIE...";
-            submitBtn.disabled = true;
-            
-            // WYSYŁANIE (TAK SAMO JAK W TESCIE EMAILJS)
-            emailjs.send("service_430hmn3", "template_znsd91r", {
-                to_email: email,
-                email: email,
-                name: email.split("@")[0]
-            })
-            .then(function(response) {
-                console.log("Sukces:", response);
-                alert("✅ DZIEKUJEMY! KOD RABATOWY WYSLANY NA " + email);
-                emailInput.value = "";
-            })
-            .catch(function(error) {
-                console.error("Blad:", error);
-                alert("❌ BLAD: " + (error.text || "Nieznany blad"));
-            })
-            .finally(function() {
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
-            });
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
