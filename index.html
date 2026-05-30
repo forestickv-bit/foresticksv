@@ -764,62 +764,51 @@
         setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
         
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
-    // ========== NEWSLETTER Z EMAILJS ==========
-(function() {
-    // ZAMIEN NA SWOJ PUBLIC KEY Z EMAILJS
+ <script>
+    // Inicjalizacja EmailJS
     emailjs.init("2T9D7EvliIOPsZn9G");
-})();
-
-// Obsluga formularza newslettera
-const newsletterForm = document.getElementById("newsletterForm");
-if(newsletterForm) {
-    newsletterForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
-        const emailInput = newsletterForm.querySelector("input[type='email']");
-        const email = emailInput?.value;
-        
-        if(!email || !email.includes("@")) {
-            alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
-            return;
-        }
-        
-        const submitBtn = newsletterForm.querySelector("button");
-        const originalText = submitBtn.innerText;
-        submitBtn.innerText = "WYSYLANIE...";
-        submitBtn.disabled = true;
-        
-        try {
-            // ZAMIEN NA SWOJE DANE
-            await emailjs.send(
-                "service_430hmn3",           // TWOJ SERVICE ID
-                "template_znsd91r",          // TWOJ TEMPLATE ID
-                {
-                    email: email,
-                    name: email.split("@")[0]
-                }
-            );
+    
+    // Obsługa formularza newslettera
+    const newsletterForm = document.getElementById("newsletterForm");
+    if(newsletterForm) {
+        newsletterForm.addEventListener("submit", function(event) {
+            event.preventDefault();
             
-            alert(`✅ DZIEKUJEMY ZA ZAPIS!\n\nNa adres ${email} wyslalismy kod rabatowy -10%\nSPRAWDZ FOLDER SPAM!`);
-            emailInput.value = "";
+            const emailInput = this.querySelector('input[type="email"]');
+            const email = emailInput.value;
             
-            // Zapisz w localStorage
-            let subscribers = JSON.parse(localStorage.getItem("newsletterSubscribers")) || [];
-            if(!subscribers.includes(email)) {
-                subscribers.push(email);
-                localStorage.setItem("newsletterSubscribers", JSON.stringify(subscribers));
+            if(!email || email.indexOf("@") === -1) {
+                alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
+                return;
             }
             
-        } catch(error) {
-            console.error("EmailJS Error:", error);
-            alert(`❌ BLAD WYSYLANIA!\n\nSprawdz czy dobrze wpisales:\n- Public Key\n- Service ID\n- Template ID`);
-        } finally {
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
-        }
-    });
-}
-    </script>
+            const submitBtn = this.querySelector("button");
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "WYSYLANIE...";
+            submitBtn.disabled = true;
+            
+            // WYSYŁANIE (TAK SAMO JAK W TESCIE EMAILJS)
+            emailjs.send("service_430hmn3", "template_znsd91r", {
+                to_email: email,
+                email: email,
+                name: email.split("@")[0]
+            })
+            .then(function(response) {
+                console.log("Sukces:", response);
+                alert("✅ DZIEKUJEMY! KOD RABATOWY WYSLANY NA " + email);
+                emailInput.value = "";
+            })
+            .catch(function(error) {
+                console.error("Blad:", error);
+                alert("❌ BLAD: " + (error.text || "Nieznany blad"));
+            })
+            .finally(function() {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+</script>
 
 </body>
 </html>
