@@ -3,27 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Foresticksv - Darkwear Store | Chatbot 24/7</title>
-    <meta name="description" content="Foresticksv - Darkwear Streetwear. Odziez inspirowana brutalizmem, awangarda i underground fashion. Bluzy, spodnie, topy, opaski. Chatbot 24/7!">
-    <meta name="keywords" content="darkwear, streetwear, foresticksv, bluzy, spodnie, topy, opaski, brutalizm, chatbot">
+    <title>Foresticksv - Darkwear Store | System Kont</title>
+    <meta name="description" content="Foresticksv - Darkwear Streetwear z systemem kont użytkowników, historią zamówień i chatbotem 24/7.">
+    <meta name="keywords" content="darkwear, streetwear, foresticksv, system kont, bluzy, spodnie">
     <meta name="author" content="Foresticksv">
-    <meta property="og:title" content="Foresticksv - Darkwear Store z Chatbotem">
-    <meta property="og:description" content="Odziez inspirowana brutalizmem i underground fashion. Pomoc 24/7 przez chatbota!">
-    <meta property="og:image" content="https://i.postimg.cc/5NtjrjXx/Chat-GPT-Image-27-maj-2026-16-31-00.png">
-    <meta property="og:type" content="website">
     
-    <!-- EmailJS - zainicjowane po załadowaniu biblioteki -->
+    <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    
-   <link rel="icon" type="image/png" href="https://i.postimg.cc/9QzBymnV/Chat-GPT-Image-30-maj-2026-15-05-50.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/9QzBymnV/Chat-GPT-Image-30-maj-2026-15-05-50.png">
     <style>
-        /* TYLKO DLA POLA EMAIL W NEWSLETTERZE - CZYTELNA CZCIONKA */
-        .signup-form input {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            text-transform: none !important;
-            letter-spacing: normal !important;
-            font-size: 14px !important;
-        }
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Share Tech Mono', 'Courier New', monospace; }
@@ -60,7 +48,7 @@
         .quick-action-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 25px; padding: 6px 14px; font-size: 0.65rem; cursor: pointer; color: #ccc; text-transform: uppercase; transition: all 0.2s; font-weight: bold; }
         .quick-action-btn:hover { background: #cc0000; color: black; border-color: #cc0000; }
         
-        /* POPRAWIONA WYSZUKIWARKA - LADNA, PRZEZROCZYSTA */
+        /* WYSZUKIWARKA */
         .search-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); backdrop-filter: blur(12px); z-index: 2100; justify-content: center; align-items: center; }
         .search-modal.active { display: flex; animation: fadeInScale 0.25s ease; }
         @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -114,6 +102,8 @@
         .logo h1 { font-size: 1.5rem; color: #ff1a1a; cursor: pointer; margin-left: 70px; text-transform: uppercase; transition: transform 0.2s; }
         .logo h1:hover { transform: scale(1.05); }
         .header-icons { display: flex; gap: 1rem; }
+        .user-icon { background: #cc0000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; font-size: 20px; }
+        .user-icon:hover { transform: scale(1.05); background: #ff1a1a; }
         .search-icon, .cart-icon { background: #cc0000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; position: relative; }
         .search-icon:hover, .cart-icon:hover { transform: scale(1.05); background: #ff1a1a; }
         .cart-count-badge { position: absolute; top: -5px; right: -5px; background: black; color: white; border-radius: 20px; padding: 0 6px; font-size: 0.7rem; font-weight: bold; }
@@ -325,7 +315,7 @@
         </div>
     </div>
 
-    <!-- NOWA LADNA WYSZUKIWARKA -->
+    <!-- LADNA WYSZUKIWARKA -->
     <div class="search-modal" id="searchModal">
         <div class="search-modal-content">
             <div class="search-modal-header">
@@ -338,6 +328,74 @@
                 <div style="text-align:center; padding:2rem; color:#666;">WPISZ NAZWE PRODUKTU</div>
             </div>
             <button class="close-search" id="closeSearchModal">ZAMKNIJ</button>
+        </div>
+    </div>
+
+    <!-- ================= MODAL LOGOWANIA/REJESTRACJI (TWOJA WERSJA) ================= -->
+    <div id="authModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="authTitle" style="color:#cc0000">🔐 LOGOWANIE</h2>
+                <button class="close-modal" id="closeAuthModal" style="background:none; color:white; font-size:24px;">✖</button>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button id="showLoginBtn" class="action-btn" style="flex:1; background:#cc0000;">LOGOWANIE</button>
+                <button id="showRegisterBtn" class="action-btn secondary" style="flex:1;">REJESTRACJA</button>
+            </div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>📧 EMAIL</label>
+                    <input type="email" id="loginEmail" placeholder="twoj@email.com">
+                </div>
+                <div class="form-group">
+                    <label>🔒 HASŁO</label>
+                    <input type="password" id="loginPassword" placeholder="********">
+                </div>
+                <button id="doLoginBtn" class="action-btn" style="width:100%;">ZALOGUJ SIĘ</button>
+                <p style="text-align:center; margin-top:15px; font-size:0.8rem;">
+                    <a href="#" id="forgotPasswordLink">Zapomniałeś hasła?</a>
+                </p>
+            </div>
+            
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label>👤 NAZWA UŻYTKOWNIKA</label>
+                    <input type="text" id="regName" placeholder="Np. Jan Kowalski">
+                </div>
+                <div class="form-group">
+                    <label>📧 EMAIL</label>
+                    <input type="email" id="regEmail" placeholder="twoj@email.com">
+                </div>
+                <div class="form-group">
+                    <label>🔒 HASŁO (min. 6 znaków)</label>
+                    <input type="password" id="regPassword" placeholder="********">
+                </div>
+                <div class="form-group">
+                    <label>🔒 POWTÓRZ HASŁO</label>
+                    <input type="password" id="regPassword2" placeholder="********">
+                </div>
+                <button id="doRegisterBtn" class="action-btn" style="width:100%;">ZAREJESTRUJ SIĘ</button>
+            </div>
+            
+            <div id="authMessage" style="margin-top:15px; padding:10px; border-radius:8px; display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL KONTA UŻYTKOWNIKA ================= -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color:#cc0000">👤 MOJE KONTO</h2>
+                <button class="close-modal" id="closeAccountModal" style="background:none; color:white; font-size:24px;">✖</button>
+            </div>
+            <div id="accountInfo"></div>
+            <div id="userOrdersList" style="margin-top: 20px;">
+                <h3 style="color:#cc0000; margin-bottom: 10px;">📦 TWOJE ZAMÓWIENIA</h3>
+                <div id="ordersContainer"></div>
+            </div>
+            <button id="logoutBtn" class="action-btn secondary" style="margin-top:20px;">🚪 WYLOGUJ SIĘ</button>
         </div>
     </div>
 
@@ -370,6 +428,7 @@
             <div class="header">
                 <div class="logo"><h1 id="homeBtn">FORESTICKSV</h1></div>
                 <div class="header-icons">
+                    <div class="user-icon" id="userIcon">👤</div>
                     <div class="search-icon" id="searchIcon">🔍</div>
                     <div class="cart-icon" id="cartIcon">🛒<span id="cartCount" class="cart-count-badge">0</span></div>
                 </div>
@@ -411,12 +470,10 @@
 
     <script>
         // ========== KONFIGURACJA EMAILJS ==========
-        // UŻYJ TWOICH DANYCH Z KONTA EMAILJS
         const EMAILJS_PUBLIC_KEY = "2T9D7EvliIOPsZn9G";
         const EMAILJS_SERVICE_ID = "service_430hmn3";
         const EMAILJS_TEMPLATE_ID = "template_znsd91r";
         
-        // Inicjalizacja EmailJS po załadowaniu biblioteki
         if (typeof emailjs !== 'undefined') {
             emailjs.init(EMAILJS_PUBLIC_KEY);
             console.log("EmailJS zainicjalizowany");
@@ -424,7 +481,162 @@
             console.error("EmailJS nie został załadowany!");
         }
 
-        // PRODUKTY Z PELNYMI OPISAMI
+        // ========== SYSTEM KONT UŻYTKOWNIKÓW (ZINTEGROWANY) ==========
+        let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+        let users = JSON.parse(localStorage.getItem("appUsers")) || {};
+
+        function saveUsers() { localStorage.setItem("appUsers", JSON.stringify(users)); }
+        function saveCurrentUser() { localStorage.setItem("currentUser", JSON.stringify(currentUser)); }
+
+        function registerUser(name, email, password) {
+            email = email.toLowerCase();
+            if(users[email]) return { success: false, message: "❌ Użytkownik z tym emailem już istnieje!" };
+            if(password.length < 6) return { success: false, message: "❌ Hasło musi mieć co najmniej 6 znaków!" };
+            
+            users[email] = {
+                name: name,
+                email: email,
+                password: password,
+                orders: [],
+                createdAt: new Date().toISOString()
+            };
+            saveUsers();
+            return { success: true, message: "✅ Rejestracja udana! Możesz się zalogować." };
+        }
+
+        function loginUser(email, password) {
+            email = email.toLowerCase();
+            let user = users[email];
+            if(!user) return { success: false, message: "❌ Nie znaleziono użytkownika!" };
+            if(user.password !== password) return { success: false, message: "❌ Nieprawidłowe hasło!" };
+            
+            currentUser = user;
+            saveCurrentUser();
+            updateUserUI();
+            return { success: true, message: `✅ Witaj ponownie, ${user.name}!` };
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem("currentUser");
+            updateUserUI();
+            return { success: true, message: "✅ Wylogowano pomyślnie!" };
+        }
+
+        function saveOrderToUser(orderData) {
+            if(currentUser && currentUser.email) {
+                let user = users[currentUser.email];
+                if(user) {
+                    let orderId = "FOREST-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+                    let newOrder = {
+                        id: orderId,
+                        date: new Date().toISOString(),
+                        total: orderData.total,
+                        items: orderData.items,
+                        status: "opłacone",
+                        tracking: null
+                    };
+                    user.orders.unshift(newOrder);
+                    users[currentUser.email] = user;
+                    saveUsers();
+                    currentUser = user;
+                    saveCurrentUser();
+                    return orderId;
+                }
+            }
+            return null;
+        }
+
+        function getUserOrders() {
+            if(currentUser && users[currentUser.email]) {
+                return users[currentUser.email].orders || [];
+            }
+            return [];
+        }
+
+        function displayUserOrders() {
+            let orders = getUserOrders();
+            let container = document.getElementById("ordersContainer");
+            if(!container) return;
+            
+            if(orders.length === 0) {
+                container.innerHTML = '<p style="color:#888;">Brak zamówień. Złóż swoje pierwsze zamówienie!</p>';
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => `
+                <div style="background:#1a1a1a; border-radius:12px; padding:12px; margin-bottom:12px; border-left:3px solid #cc0000;">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                        <div><strong>📋 NUMER:</strong> ${order.id}</div>
+                        <div><strong>📅 DATA:</strong> ${new Date(order.date).toLocaleDateString('pl-PL')}</div>
+                        <div><strong>💰 KWOTA:</strong> ${order.total.toFixed(2)} zł</div>
+                        <div><strong>📦 STATUS:</strong> <span style="color:#00cc00;">${order.status}</span></div>
+                    </div>
+                    <details style="margin-top:10px;">
+                        <summary style="cursor:pointer; color:#cc0000;">🛍️ ZOBACZ SZCZEGÓŁY</summary>
+                        <div style="margin-top:8px; font-size:0.8rem;">
+                            ${order.items.map(item => `${item.name} (${item.size}) x${item.quantity} - ${item.price} zł`).join('<br>')}
+                        </div>
+                    </details>
+                </div>
+            `).join("");
+        }
+
+        function displayAccountInfo() {
+            let container = document.getElementById("accountInfo");
+            if(!container || !currentUser) return;
+            
+            container.innerHTML = `
+                <div style="background:#1a1a1a; border-radius:12px; padding:15px;">
+                    <div style="margin-bottom:8px;"><strong>👤 NAZWA:</strong> ${currentUser.name}</div>
+                    <div style="margin-bottom:8px;"><strong>📧 EMAIL:</strong> ${currentUser.email}</div>
+                    <div><strong>📅 DOŁĄCZYŁ:</strong> ${new Date(currentUser.createdAt).toLocaleDateString('pl-PL')}</div>
+                </div>
+            `;
+            displayUserOrders();
+        }
+
+        function showAuthModal() { 
+            document.getElementById("authModal").classList.add("active");
+            document.getElementById("authMessage").style.display = "none";
+        }
+        function hideAuthModal() { document.getElementById("authModal").classList.remove("active"); }
+        function showAccountModal() { 
+            displayAccountInfo();
+            document.getElementById("accountModal").classList.add("active");
+        }
+        function hideAccountModal() { document.getElementById("accountModal").classList.remove("active"); }
+
+        function toggleAuthForms(showLogin) {
+            const loginForm = document.getElementById("loginForm");
+            const registerForm = document.getElementById("registerForm");
+            const authTitle = document.getElementById("authTitle");
+            
+            if(showLogin) {
+                loginForm.style.display = "block";
+                registerForm.style.display = "none";
+                authTitle.innerHTML = "🔐 LOGOWANIE";
+            } else {
+                loginForm.style.display = "none";
+                registerForm.style.display = "block";
+                authTitle.innerHTML = "📝 REJESTRACJA";
+            }
+        }
+
+        function updateUserUI() {
+            const userIcon = document.getElementById("userIcon");
+            if(!userIcon) return;
+            
+            if(currentUser) {
+                userIcon.innerHTML = "👤✅";
+                userIcon.title = `${currentUser.name} - kliknij aby zobaczyć konto`;
+            } else {
+                userIcon.innerHTML = "👤";
+                userIcon.title = "Zaloguj się / Zarejestruj";
+            }
+        }
+
+        // PRODUKTY
         const products = [
             { id: 1, name: "BLUZA SWETERKOWA OMN", category: "bluzy", price: 250, sizes: ["S","M","L"], 
               sizeChart: {S:{"Dlugosc calkowita":"66 cm","Dlugosc rekawa":"58 cm","Szerokosc w klatce":"52 cm"},M:{"Dlugosc calkowita":"70 cm","Dlugosc rekawa":"60 cm","Szerokosc w klatce":"56 cm"},L:{"Dlugosc calkowita":"74 cm","Dlugosc rekawa":"62 cm","Szerokosc w klatce":"60 cm"}}, 
@@ -539,7 +751,7 @@
         document.getElementById("chatbotInput").addEventListener("keypress", (e) => { if (e.key === "Enter") sendBotMessage(); });
         document.querySelectorAll(".quick-action-btn").forEach(btn => btn.onclick = () => quickAction(btn.dataset.question));
         
-        // RESZTA FUNKCJI
+        // RESZTA FUNKCJI SKLEPU
         if (!rodoAccepted) setTimeout(() => document.getElementById("rodoBanner").classList.add("show"), 1000);
         document.getElementById("rodoAccept").onclick = () => { localStorage.setItem("rodoAccepted", "true"); document.getElementById("rodoBanner").classList.remove("show"); };
         document.getElementById("rodoMore").onclick = (e) => { e.preventDefault(); alert("STRONA UZYWA COOKIES DO KOSZYKA."); };
@@ -637,7 +849,7 @@
             for (let size in currentProduct.sizeChart) {
                 sizeTableHtml += `<tr><td><strong>${size}</strong></td>${headers.map(h=>`<td>${currentProduct.sizeChart[size][h] || '-'}</td>`).join('')}</tr>`;
             }
-            sizeTableHtml += `</tbody></table></div>`;
+            sizeTableHtml += `</tbody></tr></div>`;
             document.getElementById("productDetailContent").innerHTML=`<div class="detail-images"><button class="gallery-nav gallery-prev">‹</button><img src="${imgList[currentImageIndex]}" class="detail-main-img" id="detailMainImg" onerror="handleImageError(this)"><button class="gallery-nav gallery-next">›</button><div class="detail-thumbs">${imgList.map((src,i)=>`<img src="${src}" data-index="${i}" style="border:${i===currentImageIndex?'2px solid #cc0000':'2px solid #333'}" onerror="handleImageError(this)">`).join('')}</div></div><div class="detail-info"><div class="detail-category">${currentProduct.category.toUpperCase()}</div><div class="detail-title">${currentProduct.name}</div><div class="detail-price">${currentProduct.price} zl</div><div class="detail-desc">${currentProduct.desc}</div><div class="size-selector">${currentProduct.sizes.map(s=>`<div class="size-option ${selectedSize===s?'selected':''}" data-size="${s}">${s}</div>`).join('')}</div>${sizeTableHtml}<div class="detail-buttons"><button class="action-btn" id="detailAddToCart"> DODAJ DO KOSZYKA</button><button class="action-btn secondary" id="detailFinalizeOrder"> FINALIZACJA</button></div></div>`;
             document.querySelector(".gallery-prev").onclick=()=>{currentImageIndex=(currentImageIndex-1+imgList.length)%imgList.length; renderProductDetail();};
             document.querySelector(".gallery-next").onclick=()=>{currentImageIndex=(currentImageIndex+1)%imgList.length; renderProductDetail();};
@@ -695,31 +907,24 @@
         document.querySelectorAll(".payment-method").forEach(m=>m.onclick=()=>{document.querySelectorAll(".payment-method").forEach(p=>p.classList.remove("selected")); m.classList.add("selected"); document.getElementById("selectedPayment").value=m.dataset.payment;});
         document.querySelector(".payment-method")?.classList.add("selected");
         
-        document.querySelector(".close-modal")?.addEventListener("click", () => document.getElementById("imageModal")?.classList.remove("active"));
+        document.querySelectorAll(".close-modal").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                if(document.getElementById("imageModal") && (btn.id === "closeImageModal" || e.target === btn)) document.getElementById("imageModal")?.classList.remove("active");
+                if(document.getElementById("authModal")) hideAuthModal();
+                if(document.getElementById("accountModal")) hideAccountModal();
+            });
+        });
+        
         document.getElementById("imageModal")?.addEventListener("click", (e) => { if(e.target === document.getElementById("imageModal")) document.getElementById("imageModal").classList.remove("active"); });
         
         function generatePolicyText(type) {
-            if (type === 'shipping') {
-                return "1. WSZYSTKIE ZAMOWIENIA REALIZOWANE SA W CIAGU 24-48 GODZIN\n2. KOSZTY DOSTAWY: KURIER DPD 15 ZL, PACZKOMAT INPOST 12 ZL, ODBIOR OSOBISTY 0 ZL\n3. CZAS DOSTAWY NA TERENIE POLSKI: 1-3 DNI ROBOCZYCH\n4. DARMOWA DOSTAWA PRZY ZAMOWIENIACH POWYZEJ 500 ZL\n5. ODBIOR OSOBISTY: RZESZOW, UL. 3 MAJA 15, GODZ. 10:00-18:00\n6. WYSYLKA MIEDZYNARODOWA NA INDYWIDUALNYCH ZASADACH\n7. KAZDE ZAMOWIENIE OTRZYMUJE NUMER SLEDZENIA\n8. PRZESYLKI SA STARANNIE PAKOWANE\n9. W PRZYPADKU BRAKU TOWARU POWIADAMIAMY W CIAGU 24H\n10. NIE ODPOWIADAMY ZA OPUZNIENIA SPOWODOWANE PRZEZ PRZEWOZNIKOW";
-            }
-            if (type === 'returns') {
-                return "1. MASZ PRAWO ODSTAPIC OD UMOWY BEZ PODANIA PRZYCZYNY W CIAGU 14 DNI\n2. ZWRACANY PRODUKT MUSI BYC ORYGINALNIE OZNAKOWANY\n3. KOSZTY ZWROTU PONOSI KLIENT\n4. ABY ZGLOSIC ZWROT, NAPISZ NA FORESTICKSV@GMAIL.COM\n5. PO OTRZYMANIU ZWROTU, SRODKI ZOSTANA ZWROCONE W CIAGU 14 DNI\n6. NIE PRZYJMUJEMY ZWROTOW PRODUKTOW ZNISZCZONYCH PRZEZ KLIENTA\n7. W PRZYPADKU REKLAMACJI, ROZPATRUJEMY JA DO 14 DNI\n8. WYMIANA TOWARU NA INNY ROZMIAR LUB MODEL JEST MOZLIWA\n9. ZWROTY WYSYLAJ NA ADRES: FORESTICKSV, UL. 3 MAJA 15, 35-030 RZESZOW\n10. DO ZWROTU DOLACZ DOWOD ZAKUPU";
-            }
-            if (type === 'privacy') {
-                return "1. ADMINISTRATOREM TWOICH DANYCH OSOBOWYCH JEST FORESTICKSV\n2. ZBIERAMY DANE TAKIE JAK IMIE, NAZWISKO, ADRES E-MAIL, ADRES DOSTAWY\n3. DANE SA UZYWANE WYLACZNIE DO REALIZACJI ZAMOWIEN I KONTAKTU\n4. NIE SPRZEDAJEMY ANI NIE UDOSTEPNIAMY DANYCH OSOBOM TRZECIM\n5. MASZ PRAWO WGLADU DO SWOICH DANYCH, ICH POPRAWIANIA ORAZ USUNIECIA\n6. STRONA KORZYSTA Z PLIKOW COOKIES\n7. W CELU USUNIECIA DANYCH, WYSLIJ PROSBE NA FORESTICKSV@GMAIL.COM\n8. DANE PRZECHOWUJEMY PRZEZ OKRES NIEZBEDNY DO REALIZACJI ZAMOWIENIA\n9. NASZ SKLEP UZYWA SZYFROWANIA SSL\n10. W RAZIE NARUSZENIA OCHRONY DANYCH, POINFORMUJEMY W CIAGU 72 GODZIN";
-            }
-            if (type === 'terms') {
-                return "1. REGULAMIN OKRESLA ZASADY KORZYSTANIA ZE SKLEPU INTERNETOWEGO FORESTICKSV\n2. SKLEP JEST WLASNOSCIA OSOBY FIZYCZNEJ DZIALAJACEJ POD ADRESEM RZESZOW\n3. WSZYSTKIE CENY PODANE SA W ZLOTYCH POLSKICH (PLN) I ZAWIERAJĄ PODATEK VAT\n4. ZAMOWIENIE JEST WIAZACE PO OTRZYMANIU POTWIERDZENIA E-MAILEM\n5. SKLEP ZASTRZEGA SOBIE PRAWO DO ZMIANY CEN PRZED ZLOZENIEM ZAMOWIENIA\n6. REKLAMACJE DOTYCZACE PRODUKTOW MOZNA ZGLASZAC W CIAGU 14 DNI\n7. GWARANCJA NA PRODUKTY WYNOSI 12 MIESIECY\n8. REGULAMIN JEST ZGODNY Z POLSKIM PRAWEM KONSUMENCKIM\n9. W PRZYPADKU SPORU SADEM WLASCIWYM JEST SAD W RZESZOWIE\n10. ZABRANIA SIE WYKORZYSTYWANIA TRESCI SKLEPU BEZ ZGODY WLASCICIELA";
-            }
-            if (type === 'help') {
-                return " CENTRUM POMOCY FORESTICKSV\n\n1. JAK ZLOZYC ZAMOWIENIE? WYBIERZ PRODUKT, DODAJ DO KOSZYKA, PRZEJDZ DO FINALIZACJI\n2. JAKIE SA METODY PLATNOSCI? PRZELEWY24, BLIK, KARTY PLATNICZE, PAYPAL\n3. CZY MOGE ZAPLACIC PRZY ODBIORZE? NIE – TYLKO PLATNOSCI ONLINE\n4. JAK DLUGO TRWA DOSTAWA? POLSKA 1-3 DNI, ZAGRANICA 5-10 DNI\n5. CZY MOGE ZWRÓCIC PRODUKT? TAK, 14 DNI NA ODSTAPIENIE OD UMOWY\n6. GDZIE ODBIOR OSOBISTY? RZESZOW, UL. 3 MAJA 15, 10:00-18:00\n7. NIE OTRZYMALEM POTWIERDZENIA? SPRAWDZ SPAM LUB SKONTAKTUJ SIE\n8. ZMIANA ROZMIARU PO ZAMOWIENIU? NAPISZ – ZMIENIMY PRZED WYSYLKA\n9. JAK SLEDZIC PRZESYLKE? NUMER SLEDZENIA WYSYLAMY E-MAILEM\n10. RABATY NA PIERWSZE ZAKUPY? ZAPISZ SIE DO NEWSLETTERA – KOD -10%";
-            }
-            if (type === 'contact') {
-                return " DANE KONTAKTOWE FORESTICKSV\n\n ADRES: RZESZOW, UL. 3 MAJA 15, 35-030 RZESZOW\n E-MAIL: FORESTICKSV@GMAIL.COM\n TELEFON: +48 123 456 789 (PON.-PT. 10:00-18:00)\n INSTAGRAM: @FORESTICKSVV\n TIKTOK: @FORESTICKSV\n NIP: 1234567890, REGON: 123456789\n ZWROTY: FORESTICKSV, UL. 3 MAJA 15, 35-030 RZESZOW\n GODZINY OTWARCIA: PON.-PT. 10:00-18:00";
-            }
-            if (type === 'imprint') {
-                return " IMPRINT / DANE FIRMY\n\nNAZWA: FORESTICKSV\nADRES: RZESZOW, UL. 3 MAJA 15, 35-030 RZESZOW\nE-MAIL: FORESTICKSV@GMAIL.COM\nTELEFON: +48 123 456 789\nNIP: 1234567890, REGON: 123456789\nFORMA PRAWNA: DZIALALNOSC GOSPODARCZA (OSOBA FIZYCZNA)\nWLASCICIEL: JAN KOWALSKI\nNR KONTA: PL 12 1234 5678 9012 3456 7890 1234 (MBANK)\nSAD WLASCIWY: SAD REJONOWY W RZESZOWIE\nODPOWIEDZIALNY ZA TRESC: JAN KOWALSKI\nGWARANCJA: 12 MIESIECY\nZWROTY: 14 DNI\nWSZYSTKIE ZDJECIA I OPISY NALEZA DO FORESTICKSV";
-            }
+            if (type === 'shipping') return "1. WSZYSTKIE ZAMOWIENIA REALIZOWANE SA W CIAGU 24-48 GODZIN\n2. KOSZTY DOSTAWY: KURIER DPD 15 ZL, PACZKOMAT INPOST 12 ZL, ODBIOR OSOBISTY 0 ZL\n3. CZAS DOSTAWY NA TERENIE POLSKI: 1-3 DNI ROBOCZYCH\n4. DARMOWA DOSTAWA PRZY ZAMOWIENIACH POWYZEJ 500 ZL\n5. ODBIOR OSOBISTY: RZESZOW, UL. 3 MAJA 15, GODZ. 10:00-18:00\n6. WYSYLKA MIEDZYNARODOWA NA INDYWIDUALNYCH ZASADACH\n7. KAZDE ZAMOWIENIE OTRZYMUJE NUMER SLEDZENIA\n8. PRZESYLKI SA STARANNIE PAKOWANE\n9. W PRZYPADKU BRAKU TOWARU POWIADAMIAMY W CIAGU 24H\n10. NIE ODPOWIADAMY ZA OPUZNIENIA SPOWODOWANE PRZEZ PRZEWOZNIKOW";
+            if (type === 'returns') return "1. MASZ PRAWO ODSTAPIC OD UMOWY BEZ PODANIA PRZYCZYNY W CIAGU 14 DNI\n2. ZWRACANY PRODUKT MUSI BYC ORYGINALNIE OZNAKOWANY\n3. KOSZTY ZWROTU PONOSI KLIENT\n4. ABY ZGLOSIC ZWROT, NAPISZ NA FORESTICKSV@GMAIL.COM\n5. PO OTRZYMANIU ZWROTU, SRODKI ZOSTANA ZWROCONE W CIAGU 14 DNI\n6. NIE PRZYJMUJEMY ZWROTOW PRODUKTOW ZNISZCZONYCH PRZEZ KLIENTA\n7. W PRZYPADKU REKLAMACJI, ROZPATRUJEMY JA DO 14 DNI\n8. WYMIANA TOWARU NA INNY ROZMIAR LUB MODEL JEST MOZLIWA\n9. ZWROTY WYSYLAJ NA ADRES: FORESTICKSV, UL. 3 MAJA 15, 35-030 RZESZOW\n10. DO ZWROTU DOLACZ DOWOD ZAKUPU";
+            if (type === 'privacy') return "1. ADMINISTRATOREM TWOICH DANYCH OSOBOWYCH JEST FORESTICKSV\n2. ZBIERAMY DANE TAKIE JAK IMIE, NAZWISKO, ADRES E-MAIL, ADRES DOSTAWY\n3. DANE SA UZYWANE WYLACZNIE DO REALIZACJI ZAMOWIEN I KONTAKTU\n4. NIE SPRZEDAJEMY ANI NIE UDOSTEPNIAMY DANYCH OSOBOM TRZECIM\n5. MASZ PRAWO WGLADU DO SWOICH DANYCH, ICH POPRAWIANIA ORAZ USUNIECIA\n6. STRONA KORZYSTA Z PLIKOW COOKIES\n7. W CELU USUNIECIA DANYCH, WYSLIJ PROSBE NA FORESTICKSV@GMAIL.COM\n8. DANE PRZECHOWUJEMY PRZEZ OKRES NIEZBEDNY DO REALIZACJI ZAMOWIENIA\n9. NASZ SKLEP UZYWA SZYFROWANIA SSL\n10. W RAZIE NARUSZENIA OCHRONY DANYCH, POINFORMUJEMY W CIAGU 72 GODZIN";
+            if (type === 'terms') return "1. REGULAMIN OKRESLA ZASADY KORZYSTANIA ZE SKLEPU INTERNETOWEGO FORESTICKSV\n2. SKLEP JEST WLASNOSCIA OSOBY FIZYCZNEJ DZIALAJACEJ POD ADRESEM RZESZOW\n3. WSZYSTKIE CENY PODANE SA W ZLOTYCH POLSKICH (PLN) I ZAWIERAJĄ PODATEK VAT\n4. ZAMOWIENIE JEST WIAZACE PO OTRZYMANIU POTWIERDZENIA E-MAILEM\n5. SKLEP ZASTRZEGA SOBIE PRAWO DO ZMIANY CEN PRZED ZLOZENIEM ZAMOWIENIA\n6. REKLAMACJE DOTYCZACE PRODUKTOW MOZNA ZGLASZAC W CIAGU 14 DNI\n7. GWARANCJA NA PRODUKTY WYNOSI 12 MIESIECY\n8. REGULAMIN JEST ZGODNY Z POLSKIM PRAWEM KONSUMENCKIM\n9. W PRZYPADKU SPORU SADEM WLASCIWYM JEST SAD W RZESZOWIE\n10. ZABRANIA SIE WYKORZYSTYWANIA TRESCI SKLEPU BEZ ZGODY WLASCICIELA";
+            if (type === 'help') return " CENTRUM POMOCY FORESTICKSV\n\n1. JAK ZLOZYC ZAMOWIENIE? WYBIERZ PRODUKT, DODAJ DO KOSZYKA, PRZEJDZ DO FINALIZACJI\n2. JAKIE SA METODY PLATNOSCI? PRZELEWY24, BLIK, KARTY PLATNICZE, PAYPAL\n3. CZY MOGE ZAPLACIC PRZY ODBIORZE? NIE – TYLKO PLATNOSCI ONLINE\n4. JAK DLUGO TRWA DOSTAWA? POLSKA 1-3 DNI, ZAGRANICA 5-10 DNI\n5. CZY MOGE ZWRÓCIC PRODUKT? TAK, 14 DNI NA ODSTAPIENIE OD UMOWY\n6. GDZIE ODBIOR OSOBISTY? RZESZOW, UL. 3 MAJA 15, 10:00-18:00\n7. NIE OTRZYMALEM POTWIERDZENIA? SPRAWDZ SPAM LUB SKONTAKTUJ SIE\n8. ZMIANA ROZMIARU PO ZAMOWIENIU? NAPISZ – ZMIENIMY PRZED WYSYLKA\n9. JAK SLEDZIC PRZESYLKE? NUMER SLEDZENIA WYSYLAMY E-MAILEM\n10. RABATY NA PIERWSZE ZAKUPY? ZAPISZ SIE DO NEWSLETTERA – KOD -10%";
+            if (type === 'contact') return " DANE KONTAKTOWE FORESTICKSV\n\n ADRES: RZESZOW, UL. 3 MAJA 15, 35-030 RZESZOW\n E-MAIL: FORESTICKSV@GMAIL.COM\n TELEFON: +48 123 456 789 (PON.-PT. 10:00-18:00)\n INSTAGRAM: @FORESTICKSVV\n TIKTOK: @FORESTICKSV\n NIP: 1234567890, REGON: 123456789\n ZWROTY: FORESTICKSV, UL. 3 MAJA 15, 35-030 RZESZOW\n GODZINY OTWARCIA: PON.-PT. 10:00-18:00";
+            if (type === 'imprint') return " IMPRINT / DANE FIRMY\n\nNAZWA: FORESTICKSV\nADRES: RZESZOW, UL. 3 MAJA 15, 35-030 RZESZOW\nE-MAIL: FORESTICKSV@GMAIL.COM\nTELEFON: +48 123 456 789\nNIP: 1234567890, REGON: 123456789\nFORMA PRAWNA: DZIALALNOSC GOSPODARCZA (OSOBA FIZYCZNA)\nWLASCICIEL: JAN KOWALSKI\nNR KONTA: PL 12 1234 5678 9012 3456 7890 1234 (MBANK)\nSAD WLASCIWY: SAD REJONOWY W RZESZOWIE\nODPOWIEDZIALNY ZA TRESC: JAN KOWALSKI\nGWARANCJA: 12 MIESIECY\nZWROTY: 14 DNI\nWSZYSTKIE ZDJECIA I OPISY NALEZA DO FORESTICKSV";
             return "";
         }
         
@@ -744,40 +949,23 @@
         document.getElementById("imprintLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("imprintModal", "imprint", "imprintText"); });
         document.getElementById("contactAddressLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("contactModal", "contact", "contactText"); });
         
-        // ========== NEWSLETTER Z EMAILJS ==========
+        // NEWSLETTER
         const newsletterForm = document.getElementById("newsletterForm");
         if(newsletterForm) {
             newsletterForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
-                
                 const emailInput = newsletterForm.querySelector("input[type='email']");
                 const email = emailInput?.value.trim();
-                
-                if(!email || !validateEmail(email)) {
-                    alert("❌ WPISZ POPRAWNY ADRES EMAIL!");
-                    return;
-                }
-                
+                if(!email || !validateEmail(email)) { alert("❌ WPISZ POPRAWNY ADRES EMAIL!"); return; }
                 const submitBtn = newsletterForm.querySelector("button");
                 const originalText = submitBtn.innerText;
                 submitBtn.innerText = "⏳ WYSYLANIE...";
                 submitBtn.disabled = true;
-                
                 try {
-                    if (typeof emailjs === 'undefined') {
-                        throw new Error("EmailJS nie jest załadowany");
-                    }
-                    
-                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                        email: email,
-                        name: email.split("@")[0],
-                        discount_code: "FOREST10",
-                        message: `Nowy subskrybent newslettera: ${email}`
-                    });
-                    
+                    if (typeof emailjs === 'undefined') throw new Error("EmailJS nie jest załadowany");
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { email: email, name: email.split("@")[0], discount_code: "FOREST10", message: `Nowy subskrybent newslettera: ${email}` });
                     alert(`✅ DZIEKUJEMY!\n\nKod rabatowy -10% zostal wyslany na ${email}\nSPRAWDZ FOLDER SPAM!`);
                     emailInput.value = "";
-                    
                 } catch(error) {
                     console.error("EmailJS Error:", error);
                     alert("❌ BLAD WYSYLANIA!\n\nSprawdz polaczenie z internetem.\n\n" + (error.message || "Nieznany blad"));
@@ -788,13 +976,36 @@
             });
         }
         
-        document.getElementById("orderForm")?.addEventListener("submit",(e)=>{ e.preventDefault(); if (!validateForm()) { alert("POPRAW BLEDY!"); return; } let sub=cart.reduce((s,i)=>s+i.price*i.quantity,0); let delSelect = document.getElementById("deliveryMethod"); let del = delSelect ? (parseInt(delSelect.value.split("|")[1])||0) : 0; alert(` ZAMOWIENIE ZLOZONE!\nEMAIL: ${document.getElementById("email")?.value}\nKWOTA: ${(sub+del).toFixed(2)} zl\nDZIEKUJEMY!`); cart=[]; saveCart(); showShop(); });
+        // Obsługa finalizacji zamówienia z zapisem do konta
+        document.getElementById("orderForm")?.addEventListener("submit", (e) => { 
+            e.preventDefault(); 
+            if (!validateForm()) { alert("POPRAW BLEDY!"); return; } 
+            let sub = cart.reduce((s,i)=>s+i.price*i.quantity,0); 
+            let delSelect = document.getElementById("deliveryMethod"); 
+            let del = delSelect ? (parseInt(delSelect.value.split("|")[1])||0) : 0; 
+            let totalAmount = sub + del;
+            
+            // Zapis zamówienia na koncie użytkownika (jeśli zalogowany)
+            if(currentUser && cart.length > 0) {
+                let orderData = {
+                    total: totalAmount,
+                    items: cart.map(item => ({ name: item.name, size: item.size, quantity: item.quantity, price: item.price }))
+                };
+                let orderId = saveOrderToUser(orderData);
+                if(orderId) console.log(`Zamówienie ${orderId} zapisane na koncie użytkownika`);
+            }
+            
+            alert(`✅ ZAMOWIENIE ZLOZONE!\nEMAIL: ${document.getElementById("email")?.value}\nKWOTA: ${totalAmount.toFixed(2)} zl\nDZIEKUJEMY!`); 
+            cart = []; 
+            saveCart(); 
+            showShop(); 
+        });
         
         const menuToggle = document.getElementById("menuToggle"), sidebar = document.getElementById("sidebar");
         menuToggle.addEventListener("click", (e) => { e.stopPropagation(); openSidebar(); });
         document.addEventListener("click", (e) => { if (sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== menuToggle) closeSidebar(); });
         
-        // NOWA LADNA WYSZUKIWARKA
+        // WYSZUKIWARKA
         const searchModal = document.getElementById("searchModal");
         const searchIcon = document.getElementById("searchIcon");
         const searchInputModal = document.getElementById("searchModalInput");
@@ -825,8 +1036,64 @@
         }
         searchInputModal.addEventListener("input", searchProducts);
         
-        setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
+        // Obsługa modali konta i logowania
+        document.getElementById("userIcon")?.addEventListener("click", () => {
+            if(currentUser) { showAccountModal(); } 
+            else { showAuthModal(); }
+        });
+        document.getElementById("showLoginBtn")?.addEventListener("click", () => toggleAuthForms(true));
+        document.getElementById("showRegisterBtn")?.addEventListener("click", () => toggleAuthForms(false));
+        document.getElementById("doLoginBtn")?.addEventListener("click", () => {
+            let email = document.getElementById("loginEmail").value;
+            let password = document.getElementById("loginPassword").value;
+            let result = loginUser(email, password);
+            let msgDiv = document.getElementById("authMessage");
+            msgDiv.style.display = "block";
+            msgDiv.style.backgroundColor = result.success ? "#1a3a1a" : "#3a1a1a";
+            msgDiv.style.border = `1px solid ${result.success ? "#00cc00" : "#cc0000"}`;
+            msgDiv.innerHTML = result.message;
+            if(result.success) {
+                setTimeout(() => { hideAuthModal(); document.getElementById("loginEmail").value = ""; document.getElementById("loginPassword").value = ""; }, 1500);
+            }
+        });
+        document.getElementById("doRegisterBtn")?.addEventListener("click", () => {
+            let name = document.getElementById("regName").value;
+            let email = document.getElementById("regEmail").value;
+            let password = document.getElementById("regPassword").value;
+            let password2 = document.getElementById("regPassword2").value;
+            if(password !== password2) {
+                let msgDiv = document.getElementById("authMessage");
+                msgDiv.style.display = "block";
+                msgDiv.style.backgroundColor = "#3a1a1a";
+                msgDiv.style.border = "1px solid #cc0000";
+                msgDiv.innerHTML = "❌ Hasła nie są identyczne!";
+                return;
+            }
+            let result = registerUser(name, email, password);
+            let msgDiv = document.getElementById("authMessage");
+            msgDiv.style.display = "block";
+            msgDiv.style.backgroundColor = result.success ? "#1a3a1a" : "#3a1a1a";
+            msgDiv.style.border = `1px solid ${result.success ? "#00cc00" : "#cc0000"}`;
+            msgDiv.innerHTML = result.message;
+            if(result.success) {
+                setTimeout(() => { toggleAuthForms(true); document.getElementById("regName").value = ""; document.getElementById("regEmail").value = ""; document.getElementById("regPassword").value = ""; document.getElementById("regPassword2").value = ""; document.getElementById("authMessage").style.display = "none"; }, 2000);
+            }
+        });
+        document.getElementById("logoutBtn")?.addEventListener("click", () => {
+            logoutUser();
+            hideAccountModal();
+            alert("✅ Zostałeś wylogowany!");
+        });
+        document.getElementById("forgotPasswordLink")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            alert("🔐 Funkcja resetowania hasła\n\nSkontaktuj się z administratorem: foresticksv@gmail.com");
+        });
+        document.getElementById("closeAuthModal")?.addEventListener("click", hideAuthModal);
+        document.getElementById("closeAccountModal")?.addEventListener("click", hideAccountModal);
         
+        // Inicjalizacja
+        updateUserUI();
+        setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
     </script>
 </body>
