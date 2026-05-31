@@ -448,7 +448,7 @@
                         <div class="footer-col"><h4>INFORMACJE</h4><ul><li><a href="#" id="helpCenterLink">CENTRUM POMOCY</a></li><li><a href="#" id="shippingPolicyLink">POLITYKA WYSYLKI</a></li><li><a href="#" id="returnsPolicyLink">ZWROTY</a></li><li><a href="#" id="contactFooterLink">KONTAKT</a></li></ul></div>
                         <div class="footer-col"><h4>REGULAMINY</h4><ul><li><a href="#" id="imprintLink">IMPRINT</a></li><li><a href="#" id="privacyPolicyLink">POLITYKA PRYWATNOSCI</a></li><li><a href="#" id="termsLink">REGULAMIN SKLEPU</a></li></ul></div>
                         <div class="footer-col">
-                            <h4>ZAPISZ SIE</h4>
+                            <h4>ZAPISZ SIE-Pierwsze zamowienie 10%OFF</h4>
                             <form id="newsletterForm" class="signup-form">
                                 <input type="email" name="email" placeholder="TWOJ EMAIL" required>
                                 <button type="submit">ZAPISZ SIE</button>
@@ -573,7 +573,7 @@
                         <div><strong>📦 STATUS:</strong> <span style="color:#00cc00;">${order.status}</span></div>
                     </div>
                     <details style="margin-top:10px;">
-                        <summary style="cursor:pointer; color:#cc0000;">🛍️ ZOBACZ SZCZEGÓŁY</summary>
+                        <summary style="cursor:pointer; color:#cc0000;">🛍️ ZOBACZ SZCZEGOŁY</summary>
                         <div style="margin-top:8px; font-size:0.8rem;">
                             ${order.items.map(item => `${item.name} (${item.size}) x${item.quantity} - ${item.price} zł`).join('<br>')}
                         </div>
@@ -590,7 +590,7 @@
                 <div style="background:#1a1a1a; border-radius:12px; padding:15px;">
                     <div style="margin-bottom:8px;"><strong>👤 NAZWA:</strong> ${currentUser.name}</div>
                     <div style="margin-bottom:8px;"><strong>📧 EMAIL:</strong> ${currentUser.email}</div>
-                    <div><strong>📅 DOŁĄCZYŁ:</strong> ${new Date(currentUser.createdAt).toLocaleDateString('pl-PL')}</div>
+                    <div><strong>📅 DOLACZYL:</strong> ${new Date(currentUser.createdAt).toLocaleDateString('pl-PL')}</div>
                 </div>
             `;
             displayUserOrders();
@@ -628,7 +628,7 @@
             if(!userIcon) return;
             
             if(currentUser) {
-                userIcon.innerHTML = "👤✅";
+                userIcon.innerHTML = "🗿";
                 userIcon.title = `${currentUser.name} - kliknij aby zobaczyć konto`;
             } else {
                 userIcon.innerHTML = "👤";
