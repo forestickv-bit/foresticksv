@@ -315,7 +315,7 @@
         </div>
     </div>
 
-    <!-- LADNA WYSZUKIWARKA -->
+    <!-- WYSZUKIWARKA -->
     <div class="search-modal" id="searchModal">
         <div class="search-modal-content">
             <div class="search-modal-header">
@@ -331,7 +331,7 @@
         </div>
     </div>
 
-    <!-- ================= MODAL LOGOWANIA/REJESTRACJI (TWOJA WERSJA) ================= -->
+    <!-- MODAL LOGOWANIA/REJESTRACJI -->
     <div id="authModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- ================= MODAL KONTA UŻYTKOWNIKA ================= -->
+    <!-- MODAL KONTA UŻYTKOWNIKA -->
     <div id="accountModal" class="modal">
         <div class="modal-content" style="max-width: 600px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -472,7 +472,8 @@
         // ========== KONFIGURACJA EMAILJS ==========
         const EMAILJS_PUBLIC_KEY = "2T9D7EvliIOPsZn9G";
         const EMAILJS_SERVICE_ID = "service_430hmn3";
-        const EMAILJS_TEMPLATE_ID = "template_znsd91r";
+        const EMAILJS_NEWSLETTER_TEMPLATE_ID = "template_znsd91r";
+        const EMAILJS_ORDER_TEMPLATE_ID = "template_qhqxvim";  // <-- NOWY TEMPLATE DLA ZAMÓWIEŃ
         
         if (typeof emailjs !== 'undefined') {
             emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -481,7 +482,36 @@
             console.error("EmailJS nie został załadowany!");
         }
 
-        // ========== SYSTEM KONT UŻYTKOWNIKÓW (ZINTEGROWANY) ==========
+        // ========== FUNKCJA WYSYŁAJĄCA E-MAIL Z ZAMÓWIENIEM ==========
+        async function sendOrderEmail(orderDetails) {
+            try {
+                const templateParams = {
+                    email: orderDetails.email,
+                    order_id: orderDetails.order_id,
+                    order_date: orderDetails.order_date,
+                    total: orderDetails.total.toFixed(2),
+                    subtotal: orderDetails.subtotal.toFixed(2),
+                    shipping: orderDetails.shipping.toFixed(2),
+                    payment: orderDetails.payment,
+                    delivery_method: orderDetails.delivery_method,
+                    address: orderDetails.address,
+                    phone: orderDetails.phone,
+                    items_list: orderDetails.items_list,
+                    items_count: orderDetails.items_count
+                };
+                
+                console.log("Wysyłanie zamówienia na e-mail:", templateParams);
+                
+                const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ORDER_TEMPLATE_ID, templateParams);
+                console.log("E-mail z zamówieniem wysłany pomyślnie!", response);
+                return true;
+            } catch (error) {
+                console.error("Błąd wysyłki e-maila z zamówieniem:", error);
+                return false;
+            }
+        }
+
+        // ========== SYSTEM KONT UŻYTKOWNIKÓW ==========
         let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
         let users = JSON.parse(localStorage.getItem("appUsers")) || {};
 
@@ -527,7 +557,7 @@
             if(currentUser && currentUser.email) {
                 let user = users[currentUser.email];
                 if(user) {
-                    let orderId = "FOREST-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+                    let orderId = orderData.order_id || ("FOREST-" + Date.now() + "-" + Math.floor(Math.random() * 1000));
                     let newOrder = {
                         id: orderId,
                         date: new Date().toISOString(),
@@ -636,7 +666,7 @@
             }
         }
 
-        // PRODUKTY
+        // ========== PRODUKTY ==========
         const products = [
             { id: 1, name: "BLUZA SWETERKOWA OMN", category: "bluzy", price: 250, sizes: ["S","M","L"], 
               sizeChart: {S:{"Dlugosc calkowita":"66 cm","Dlugosc rekawa":"58 cm","Szerokosc w klatce":"52 cm"},M:{"Dlugosc calkowita":"70 cm","Dlugosc rekawa":"60 cm","Szerokosc w klatce":"56 cm"},L:{"Dlugosc calkowita":"74 cm","Dlugosc rekawa":"62 cm","Szerokosc w klatce":"60 cm"}}, 
@@ -676,7 +706,7 @@
         let recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
         let rodoAccepted = localStorage.getItem("rodoAccepted");
 
-        // CHATBOT
+        // ========== CHATBOT ==========
         const botResponses = {
             "rozmiary": " ROZMIAROWKA FORESTICKSV \n\n BLUZY: S(66cm), M(70cm), L(74cm)\n SPODNIE: S(104cm), M(108cm), L(112cm)\n TOPY: S(58cm), M(62cm), L(66cm)",
             "dostawa": " DOSTAWA: KURIER DPD 15 ZL (1-2 DNI), PACZKOMAT 12 ZL, ODBIOR OSOBISTY 0 ZL (RZESZOW, UL. 3 MAJA 15). DARMOWA DOSTAWA POWYZEJ 500 ZL!",
@@ -751,7 +781,7 @@
         document.getElementById("chatbotInput").addEventListener("keypress", (e) => { if (e.key === "Enter") sendBotMessage(); });
         document.querySelectorAll(".quick-action-btn").forEach(btn => btn.onclick = () => quickAction(btn.dataset.question));
         
-        // RESZTA FUNKCJI SKLEPU
+        // ========== RESZTA FUNKCJI SKLEPU ==========
         if (!rodoAccepted) setTimeout(() => document.getElementById("rodoBanner").classList.add("show"), 1000);
         document.getElementById("rodoAccept").onclick = () => { localStorage.setItem("rodoAccepted", "true"); document.getElementById("rodoBanner").classList.remove("show"); };
         document.getElementById("rodoMore").onclick = (e) => { e.preventDefault(); alert("STRONA UZYWA COOKIES DO KOSZYKA."); };
@@ -849,7 +879,7 @@
             for (let size in currentProduct.sizeChart) {
                 sizeTableHtml += `<tr><td><strong>${size}</strong></td>${headers.map(h=>`<td>${currentProduct.sizeChart[size][h] || '-'}</td>`).join('')}</tr>`;
             }
-            sizeTableHtml += `</tbody></tr></div>`;
+            sizeTableHtml += `</tbody></table></div>`;
             document.getElementById("productDetailContent").innerHTML=`<div class="detail-images"><button class="gallery-nav gallery-prev">‹</button><img src="${imgList[currentImageIndex]}" class="detail-main-img" id="detailMainImg" onerror="handleImageError(this)"><button class="gallery-nav gallery-next">›</button><div class="detail-thumbs">${imgList.map((src,i)=>`<img src="${src}" data-index="${i}" style="border:${i===currentImageIndex?'2px solid #cc0000':'2px solid #333'}" onerror="handleImageError(this)">`).join('')}</div></div><div class="detail-info"><div class="detail-category">${currentProduct.category.toUpperCase()}</div><div class="detail-title">${currentProduct.name}</div><div class="detail-price">${currentProduct.price} zl</div><div class="detail-desc">${currentProduct.desc}</div><div class="size-selector">${currentProduct.sizes.map(s=>`<div class="size-option ${selectedSize===s?'selected':''}" data-size="${s}">${s}</div>`).join('')}</div>${sizeTableHtml}<div class="detail-buttons"><button class="action-btn" id="detailAddToCart"> DODAJ DO KOSZYKA</button><button class="action-btn secondary" id="detailFinalizeOrder"> FINALIZACJA</button></div></div>`;
             document.querySelector(".gallery-prev").onclick=()=>{currentImageIndex=(currentImageIndex-1+imgList.length)%imgList.length; renderProductDetail();};
             document.querySelector(".gallery-next").onclick=()=>{currentImageIndex=(currentImageIndex+1)%imgList.length; renderProductDetail();};
@@ -949,7 +979,7 @@
         document.getElementById("imprintLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("imprintModal", "imprint", "imprintText"); });
         document.getElementById("contactAddressLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("contactModal", "contact", "contactText"); });
         
-        // NEWSLETTER
+        // ========== NEWSLETTER ==========
         const newsletterForm = document.getElementById("newsletterForm");
         if(newsletterForm) {
             newsletterForm.addEventListener("submit", async (e) => {
@@ -963,7 +993,7 @@
                 submitBtn.disabled = true;
                 try {
                     if (typeof emailjs === 'undefined') throw new Error("EmailJS nie jest załadowany");
-                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { email: email, name: email.split("@")[0], discount_code: "FOREST10", message: `Nowy subskrybent newslettera: ${email}` });
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_NEWSLETTER_TEMPLATE_ID, { email: email, name: email.split("@")[0], discount_code: "FOREST10", message: `Nowy subskrybent newslettera: ${email}` });
                     alert(`✅ DZIEKUJEMY!\n\nKod rabatowy -10% zostal wyslany na ${email}\nSPRAWDZ FOLDER SPAM!`);
                     emailInput.value = "";
                 } catch(error) {
@@ -976,26 +1006,77 @@
             });
         }
         
-        // Obsługa finalizacji zamówienia z zapisem do konta
-        document.getElementById("orderForm")?.addEventListener("submit", (e) => { 
+        // ========== FINALIZACJA ZAMÓWIENIA Z WYSYŁKĄ E-MAIL ==========
+        document.getElementById("orderForm")?.addEventListener("submit", async (e) => { 
             e.preventDefault(); 
             if (!validateForm()) { alert("POPRAW BLEDY!"); return; } 
-            let sub = cart.reduce((s,i)=>s+i.price*i.quantity,0); 
-            let delSelect = document.getElementById("deliveryMethod"); 
-            let del = delSelect ? (parseInt(delSelect.value.split("|")[1])||0) : 0; 
-            let totalAmount = sub + del;
+            
+            const subtotal = cart.reduce((s,i)=>s+i.price*i.quantity,0); 
+            const deliverySelect = document.getElementById("deliveryMethod"); 
+            const deliveryInfo = deliverySelect ? deliverySelect.value.split("|") : ["kurier DPD", "15"];
+            const deliveryMethod = deliveryInfo[0];
+            const deliveryCost = parseFloat(deliveryInfo[1]) || 0;
+            const totalAmount = subtotal + deliveryCost;
+            const customerEmail = document.getElementById("email")?.value;
+            const customerPhone = document.getElementById("phone")?.value;
+            const customerAddress = document.getElementById("address")?.value;
+            const selectedPayment = document.getElementById("selectedPayment")?.value || "Przelew";
+            
+            // Przygotowanie listy produktów dla e-maila
+            const itemsList = cart.map(item => `${item.name} (${item.size}) x${item.quantity} – ${(item.price * item.quantity).toFixed(2)} zł`).join("\n");
+            const orderId = "FOREST-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+            const orderDate = new Date().toLocaleString('pl-PL');
+            
+            // Dane do wysyłki e-mail
+            const orderDetails = {
+                email: customerEmail,
+                order_id: orderId,
+                order_date: orderDate,
+                total: totalAmount,
+                subtotal: subtotal,
+                shipping: deliveryCost,
+                payment: selectedPayment,
+                delivery_method: deliveryMethod,
+                address: customerAddress,
+                phone: customerPhone,
+                items_list: itemsList,
+                items_count: cart.length
+            };
+            
+            // WYSYŁKA E-MAIL PRZEZ EMAILJS (szablon template_qhqxvim)
+            const emailSent = await sendOrderEmail(orderDetails);
+            
+            if(emailSent) {
+                console.log("✅ E-mail z zamówieniem wysłany pomyślnie!");
+            } else {
+                console.warn("⚠️ Nie udało się wysłać e-maila, ale zamówienie zostanie zapisane.");
+            }
             
             // Zapis zamówienia na koncie użytkownika (jeśli zalogowany)
             if(currentUser && cart.length > 0) {
                 let orderData = {
+                    order_id: orderId,
                     total: totalAmount,
                     items: cart.map(item => ({ name: item.name, size: item.size, quantity: item.quantity, price: item.price }))
                 };
-                let orderId = saveOrderToUser(orderData);
-                if(orderId) console.log(`Zamówienie ${orderId} zapisane na koncie użytkownika`);
+                saveOrderToUser(orderData);
+                console.log(`Zamówienie ${orderId} zapisane na koncie użytkownika`);
             }
             
-            alert(`✅ ZAMOWIENIE ZLOZONE!\nEMAIL: ${document.getElementById("email")?.value}\nKWOTA: ${totalAmount.toFixed(2)} zl\nDZIEKUJEMY!`); 
+            // Komunikat dla klienta
+            let message = `✅ ZAMOWIENIE ZLOZONE!\n\n`;
+            message += `NUMER: ${orderId}\n`;
+            message += `DATA: ${orderDate}\n`;
+            message += `EMAIL: ${customerEmail}\n`;
+            message += `KWOTA: ${totalAmount.toFixed(2)} zl\n`;
+            message += `DOSTAWA: ${deliveryMethod}\n`;
+            message += `PLATNOSC: ${selectedPayment}\n\n`;
+            message += `POTWIERDZENIE ZOSTALO WYSLANE NA TWOJEGO E-MAILA.\n`;
+            message += `DZIEKUJEMY ZA ZAKUPY!`;
+            
+            alert(message); 
+            
+            // Czyszczenie koszyka i powrót do sklepu
             cart = []; 
             saveCart(); 
             showShop(); 
@@ -1005,7 +1086,7 @@
         menuToggle.addEventListener("click", (e) => { e.stopPropagation(); openSidebar(); });
         document.addEventListener("click", (e) => { if (sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== menuToggle) closeSidebar(); });
         
-        // WYSZUKIWARKA
+        // ========== WYSZUKIWARKA ==========
         const searchModal = document.getElementById("searchModal");
         const searchIcon = document.getElementById("searchIcon");
         const searchInputModal = document.getElementById("searchModalInput");
@@ -1036,7 +1117,7 @@
         }
         searchInputModal.addEventListener("input", searchProducts);
         
-        // Obsługa modali konta i logowania
+        // ========== OBSŁUGA MODALI KONTA I LOGOWANIA ==========
         document.getElementById("userIcon")?.addEventListener("click", () => {
             if(currentUser) { showAccountModal(); } 
             else { showAuthModal(); }
@@ -1091,7 +1172,7 @@
         document.getElementById("closeAuthModal")?.addEventListener("click", hideAuthModal);
         document.getElementById("closeAccountModal")?.addEventListener("click", hideAccountModal);
         
-        // Inicjalizacja
+        // ========== INICJALIZACJA ==========
         updateUserUI();
         setTimeout(() => { document.getElementById("skeletonGrid").style.display = "none"; document.getElementById("productsGrid").style.display = "grid"; }, 800);
         renderCategories(); renderFilters(); renderProducts(); saveCart(); renderRecentlyViewed();
