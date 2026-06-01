@@ -2261,19 +2261,19 @@ input[type="password"],
                     <div class="checkout-form">
                         <h3>📋 DANE ZAMÓWIENIA</h3>
                         <form id="orderForm" novalidate>
-                            <div class="form-group" id="orderEmailGroup">
-                                <label for="orderEmail">📧 EMAIL</label>
-                                <input type="email" id="orderEmail" required placeholder="TWÓJ@EMAIL.COM" autocomplete="email">
+                            <div class="form-group" id="emailGroup">
+                                <label for="email">📧 EMAIL</label>
+                                <input type="email" id="email" required placeholder="TWÓJ@EMAIL.COM" autocomplete="email">
                                 <div class="error-message">WPISZ POPRAWNY EMAIL</div>
                             </div>
-                            <div class="form-group" id="orderPhoneGroup">
-                                <label for="orderPhone">📱 TELEFON (9 CYFR)</label>
-                                <input type="tel" id="orderPhone" required placeholder="123456789" autocomplete="tel">
+                            <div class="form-group" id="phoneGroup">
+                                <label for="phone">📱 TELEFON (9 CYFR)</label>
+                                <input type="tel" id="phone" required placeholder="123456789" autocomplete="tel">
                                 <div class="error-message">WPISZ 9 CYFR</div>
                             </div>
-                            <div class="form-group" id="orderAddressGroup">
-                                <label for="orderAddress">📍 ADRES</label>
-                                <textarea id="orderAddress" rows="2" required placeholder="ULICA, NUMER, MIASTO, KOD" autocomplete="street-address"></textarea>
+                            <div class="form-group" id="addressGroup">
+                                <label for="address">📍 ADRES</label>
+                                <textarea id="address" rows="2" required placeholder="ULICA, NUMER, MIASTO, KOD" autocomplete="street-address"></textarea>
                                 <div class="error-message">ADRES WYMAGANY (min. 5 znaków)</div>
                             </div>
                             <div class="form-group">
@@ -2857,7 +2857,7 @@ input[type="password"],
         
         validateAddress() {
             const group = document.getElementById('addressGroup');
-            const input = document.getElementById('orderAddress');
+            const input = document.getElementById('address');
             if (!input || !group) return false;
             const isValid = input.value.trim().length >= CONFIG.MIN_ADDRESS_LENGTH;
             group.classList.toggle('form-group--error', !isValid);
@@ -2865,8 +2865,8 @@ input[type="password"],
         },
         
         validateCheckoutForm() {
-            return this.validateField('orderEmail', Utils.validateEmail) &&
-                   this.validateField('orderPhone', Utils.validatePhone) &&
+            return this.validateField('email', Utils.validateEmail) &&
+                   this.validateField('phone', Utils.validatePhone) &&
                    this.validateAddress();
         },
         
@@ -2888,9 +2888,9 @@ input[type="password"],
             if (!this.validateCheckoutForm()) return { success: false, message: "POPRAW BŁĘDY W FORMULARZU!" };
             if (Cart.isEmpty()) return { success: false, message: "KOSZYK JEST PUSTY!" };
             
-            const email = document.getElementById('orderEmail').value;
-            const phone = document.getElementById('orderPhone').value;
-            const address = document.getElementById('orderAddress').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
             const deliverySelect = document.getElementById('deliveryMethod');
             const [deliveryMethod, deliveryCostStr] = deliverySelect.value.split('|');
             const deliveryCost = parseFloat(deliveryCostStr);
