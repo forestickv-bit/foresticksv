@@ -480,6 +480,16 @@
             ADMIN_NAME: "Administrator Foresticksv"
         };
 
+        // ========== PROSTA FUNKCJA HASHUJĄCA (SHA-256) ==========
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
         // ========== FUNKCJE POMOCNICZE ==========
         function escapeHTML(str) {
             const div = document.createElement('div');
@@ -514,7 +524,7 @@
             console.error("❌ Błąd inicjalizacji EmailJS:", e);
         }
 
-        // ========== SYSTEM STORAGE Z PROSTYM SZYFROWANIEM (BEZPIECZNIEJSZE NIŻ CZYSTY TEKST, ALE NIE IDEALNE) ==========
+        // ========== SYSTEM STORAGE ==========
         const STORAGE_PREFIX = "fsv_";
         
         function storageSet(key, value) {
@@ -545,7 +555,7 @@
             localStorage.removeItem(STORAGE_PREFIX + key);
         }
 
-        // ========== SYSTEM KONT UŻYTKOWNIKÓW ==========
+        // ========== SYSTEM KONT UŻYTKOWNIKÓW Z HASHOWANIEM HASEŁ ==========
         let currentUser = null;
         let users = {};
 
@@ -561,32 +571,33 @@
             }
         }
 
-        function loadAllData() {
+        async function loadAllData() {
             users = storageGet("users") || {};
             currentUser = storageGet("currentUser") || null;
             
-            // Upewnij się, że konto admina istnieje
-            ensureAdminAccount();
+            // Upewnij się, że konto admina istnieje z hashowanym hasłem
+            await ensureAdminAccount();
         }
 
-        function ensureAdminAccount() {
+        async function ensureAdminAccount() {
             const adminEmail = CONFIG.ADMIN_EMAIL.toLowerCase();
             if (!users[adminEmail]) {
+                const hashedPassword = await hashPassword(CONFIG.ADMIN_PASSWORD);
                 users[adminEmail] = {
                     name: CONFIG.ADMIN_NAME,
                     email: adminEmail,
-                    password: CONFIG.ADMIN_PASSWORD,
+                    password: hashedPassword,
                     orders: [],
                     createdAt: new Date().toISOString()
                 };
                 saveUsers();
-                console.log("✅ Konto administratora utworzone");
+                console.log("✅ Konto administratora utworzone z zahashowanym hasłem");
             }
         }
 
-        function registerUser(name, email, password) {
+        async function registerUser(name, email, password) {
             email = email.toLowerCase();
-            loadAllData();
+            await loadAllData();
             
             if (users[email]) {
                 return { success: false, message: "❌ Użytkownik z tym emailem już istnieje!" };
@@ -598,10 +609,13 @@
                 return { success: false, message: "❌ Nazwa użytkownika jest wymagana!" };
             }
 
+            // Hashujemy hasło przed zapisaniem
+            const hashedPassword = await hashPassword(password);
+            
             users[email] = {
                 name: name.trim(),
                 email: email,
-                password: password,
+                password: hashedPassword,
                 orders: [],
                 createdAt: new Date().toISOString()
             };
@@ -609,15 +623,18 @@
             return { success: true, message: "✅ Rejestracja udana! Możesz się zalogować." };
         }
 
-        function loginUser(email, password) {
+        async function loginUser(email, password) {
             email = email.toLowerCase();
-            loadAllData();
+            await loadAllData();
             
             let user = users[email];
             if (!user) {
                 return { success: false, message: "❌ Nie znaleziono użytkownika!" };
             }
-            if (user.password !== password) {
+            
+            // Hashujemy wprowadzone hasło i porównujemy z przechowywanym
+            const hashedInputPassword = await hashPassword(password);
+            if (user.password !== hashedInputPassword) {
                 return { success: false, message: "❌ Nieprawidłowe hasło!" };
             }
 
@@ -638,7 +655,6 @@
 
         function saveOrderToUser(orderData) {
             if (currentUser && currentUser.email) {
-                loadAllData();
                 let user = users[currentUser.email];
                 if (user) {
                     let orderId = orderData.order_id || ("FOREST-" + Date.now() + "-" + Math.floor(Math.random() * 1000));
@@ -649,7 +665,7 @@
                         items: orderData.items,
                         status: "opłacone",
                         tracking: null,
-                        address: orderData.address || currentUser.address || '',
+                        address: orderData.address || '',
                         payment: orderData.payment || ''
                     };
                     user.orders.unshift(newOrder);
@@ -664,7 +680,6 @@
         }
 
         function getUserOrders() {
-            loadAllData();
             if (currentUser && users[currentUser.email]) {
                 return users[currentUser.email].orders || [];
             }
@@ -704,7 +719,6 @@
 
         // ========== PANEL ADMINA ==========
         function getAllOrdersForAdmin() {
-            loadAllData();
             let allOrders = [];
 
             for (let email in users) {
@@ -719,7 +733,6 @@
                 }
             }
 
-            // Sortuj od najnowszych
             allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
             return allOrders;
         }
@@ -1130,7 +1143,6 @@
                     <button class="close-quickview" style="background:#444; margin-top:8px">ZAMKNIJ</button>
                 </div>`;
 
-            // Domyślnie zaznacz pierwszy rozmiar
             const firstSize = document.querySelector("#qvSizes .size-opt");
             if (firstSize) firstSize.classList.add("selected");
 
@@ -1218,7 +1230,6 @@
                     </div>
                 </div>`;
 
-            // Eventy galerii
             document.querySelector(".gallery-prev").onclick = () => {
                 currentImageIndex = (currentImageIndex - 1 + imgList.length) % imgList.length;
                 renderProductDetail();
@@ -1239,7 +1250,6 @@
                 };
             });
 
-            // Eventy rozmiarów
             document.querySelectorAll(".size-option").forEach(opt => {
                 opt.onclick = () => {
                     selectedSize = opt.dataset.size;
@@ -1247,7 +1257,6 @@
                 };
             });
 
-            // Przyciski akcji
             document.getElementById("detailAddToCart").onclick = () => {
                 addToCart(currentProduct, selectedSize);
             };
@@ -1437,7 +1446,7 @@
             });
         }
 
-        // ========== CHATBOT (ZABEZPIECZONY PRZED XSS) ==========
+        // ========== CHATBOT ==========
         const botResponses = {
             "rozmiary": " ROZMIAROWKA FORESTICKSV \n\n BLUZY: S(66cm), M(70cm), L(74cm)\n SPODNIE: S(104cm), M(108cm), L(112cm)\n TOPY: S(58cm), M(62cm), L(66cm)",
             "dostawa": " DOSTAWA: KURIER DPD 15 ZL (1-2 DNI), PACZKOMAT 12 ZL, ODBIOR OSOBISTY 0 ZL (RZESZOW, UL. 3 MAJA 15). DARMOWA DOSTAWA POWYZEJ 500 ZL!",
@@ -1467,7 +1476,6 @@
 
             const msgDiv = document.createElement("div");
             msgDiv.className = "message bot";
-            // Bezpieczne wstawianie tekstu z obsługą nowych linii
             msgDiv.innerHTML = escapeHTML(text).replace(/\n/g, '<br>');
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
@@ -1479,7 +1487,6 @@
 
             const msgDiv = document.createElement("div");
             msgDiv.className = "message user";
-            // Używamy textContent aby zapobiec XSS
             msgDiv.textContent = text;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
@@ -1531,389 +1538,54 @@
             }, 500);
         }
 
-       // ========== POLITYKI ==========
-function generatePolicyText(type) {
-    const policies = {
-        'shipping': `🚚 POLITYKA WYSYŁKI - FORESTICKSV
-
-1. CZAS REALIZACJI ZAMÓWIENIA
-Wszystkie zamówienia są realizowane w ciągu 24-48 godzin od momentu zaksięgowania wpłaty. W przypadku zamówień złożonych w weekendy i święta, realizacja rozpoczyna się następnego dnia roboczego.
-
-2. KOSZTY DOSTAWY
-• Kurier DPD - 15 zł (dostawa 1-2 dni robocze)
-• Paczkomat InPost - 12 zł (dostawa 1-2 dni robocze)
-• Odbiór osobisty - 0 zł (Rzeszów, ul. 3 Maja 15)
-
-3. DARMOWA DOSTAWA
-Darmowa dostawa obowiązuje przy zamówieniach powyżej 500 zł. Dotyczy tylko przesyłek na terenie Polski.
-
-4. CZAS DOSTAWY
-• Polska: 1-3 dni robocze
-• Europa: 5-10 dni roboczych
-• Reszta świata: 10-21 dni roboczych
-
-5. ODBIÓR OSOBISTY
-Adres: Rzeszów, ul. 3 Maja 15, 35-030
-Godziny odbioru: Poniedziałek - Piątek, 10:00-18:00
-Po złożeniu zamówienia otrzymasz e-mail z potwierdzeniem gotowości do odbioru.
-
-6. WYSYŁKA MIĘDZYNARODOWA
-Koszt wysyłki międzynarodowej jest ustalany indywidualnie. Skontaktuj się z nami przed złożeniem zamówienia: foresticksv@gmail.com
-
-7. ŚLEDZENIE PRZESYŁKI
-Każde zamówienie otrzymuje unikalny numer śledzenia. Numer wysyłamy e-mailem natychmiast po nadaniu paczki.
-
-8. PAKOWANIE
-Wszystkie produkty są starannie pakowane w specjalne opakowania ochronne, aby zapewnić bezpieczeństwo podczas transportu.
-
-9. BRAK TOWARU
-W przypadku braku zamówionego produktu w magazynie, informujemy o tym w ciągu 24 godzin i proponujemy alternatywne rozwiązanie.
-
-10. ODPOWIEDZIALNOŚĆ
-Nie odpowiadamy za opóźnienia spowodowane przez firmy kurierskie. W przypadku zagubienia paczki, rozpoczynamy procedurę reklamacyjną u przewoźnika.`,
-
-        'returns': `🔄 POLITYKA ZWROTÓW - FORESTICKSV
-
-1. PRAWO ODSTĄPIENIA OD UMOWY
-Zgodnie z polskim prawem, masz prawo odstąpić od umowy bez podania przyczyny w ciągu 14 dni od daty otrzymania zamówienia.
-
-2. WARUNKI ZWROTU
-• Produkt musi być w oryginalnym stanie, nieużywany
-• Wszystkie metki i oznaczenia muszą być nienaruszone
-• Produkt musi być zwrócony w oryginalnym opakowaniu
-
-3. KOSZTY ZWROTU
-Koszty odesłania produktu ponosi klient. W przypadku wymiany na inny rozmiar, koszt wysyłki nowego produktu pokrywa sklep.
-
-4. JAK ZGŁOSIĆ ZWROT?
-Wyślij e-mail na adres: foresticksv@gmail.com
-W treści podaj:
-• Numer zamówienia
-• Nazwę produktu
-• Powód zwrotu (opcjonalnie)
-
-5. ZWROT PŁATNOŚCI
-Po otrzymaniu i sprawdzeniu zwróconego produktu, środki zostaną zwrócone w ciągu 14 dni na konto, z którego dokonano płatności.
-
-6. PRODUKTY NIE PODLEGAJĄCE ZWROTOWI
-• Produkty zniszczone przez klienta
-• Produkty noszące ślady użytkowania
-• Produkty bez oryginalnych metek
-
-7. REKLAMACJE
-W przypadku wady fabrycznej, rozpatrujemy reklamację w ciągu 14 dni. Wymieniamy produkt na nowy lub zwracamy pełną kwotę.
-
-8. WYMIANA NA INNY ROZMIAR
-Wymiana na inny rozmiar jest możliwa. Skontaktuj się z nami, a my zarezerwujemy dla Ciebie odpowiedni rozmiar.
-
-9. ADRES DO ZWROTÓW
-Foresticksv
-ul. 3 Maja 15
-35-030 Rzeszów
-
-10. DOKUMENTY
-Do przesyłki zwrotnej dołącz dowód zakupu (paragon lub potwierdzenie zamówienia).`,
-
-        'privacy': `🔒 POLITYKA PRYWATNOŚCI - FORESTICKSV
-
-1. ADMINISTRATOR DANYCH
-Administratorem Twoich danych osobowych jest Foresticksv, z siedzibą przy ul. 3 Maja 15, 35-030 Rzeszów.
-
-2. JAKIE DANE ZBIERAMY?
-• Imię i nazwisko
-• Adres e-mail
-• Adres dostawy
-• Numer telefonu
-• Dane do faktury (opcjonalnie)
-
-3. CEL ZBIERANIA DANYCH
-Dane są zbierane wyłącznie w celu:
-• Realizacji zamówień
-• Kontaktu z klientem
-• Wysyłki newslettera (za zgodą)
-• Wystawienia faktury
-
-4. UDOSTĘPNIANIE DANYCH
-NIE sprzedajemy, NIE wynajmujemy i NIE udostępniamy Twoich danych osobowych podmiotom trzecim, z wyjątkiem:
-• Firm kurierskich (w celu dostawy)
-• Operatorów płatności (w celu realizacji płatności)
-
-5. TWOJE PRAWA
-Masz prawo do:
-• Wglądu w swoje dane
-• Poprawiania danych
-• Usunięcia danych ("prawo do bycia zapomnianym")
-• Ograniczenia przetwarzania
-• Przenoszenia danych
-• Wniesienia sprzeciwu
-
-6. COOKIES
-Nasza strona używa plików cookies wyłącznie do:
-• Zapamiętania zawartości koszyka
-• Utrzymania sesji użytkownika
-• Zapamiętania preferencji (np. akceptacja RODO)
-Nie używamy cookies marketingowych ani śledzących.
-
-7. USUNIĘCIE DANYCH
-Aby usunąć swoje dane, wyślij prośbę na adres: foresticksv@gmail.com
-Dane zostaną usunięte w ciągu 30 dni.
-
-8. OKRES PRZECHOWYWANIA
-Dane przechowujemy przez okres niezbędny do realizacji zamówienia oraz przez okres wymagany przepisami prawa podatkowego (5 lat dla faktur).
-
-9. BEZPIECZEŃSTWO
-• Strona używa szyfrowania SSL/TLS
-• Dane są przechowywane w bezpieczny sposób
-• Regularnie aktualizujemy zabezpieczenia
-
-10. NARUSZENIE DANYCH
-W przypadku naruszenia ochrony danych, poinformujemy Cię w ciągu 72 godzin od wykrycia incydentu.`,
-
-        'terms': `📜 REGULAMIN SKLEPU - FORESTICKSV
-
-§1. POSTANOWIENIA OGÓLNE
-1. Niniejszy regulamin określa zasady korzystania ze sklepu internetowego Foresticksv.
-2. Sklep jest własnością: Foresticksv, ul. 3 Maja 15, 35-030 Rzeszów.
-3. Kontakt: foresticksv@gmail.com, tel. +48 123 456 789.
-
-§2. DEFINICJE
-1. Sprzedawca - Foresticksv
-2. Klient - osoba fizyczna, prawna lub jednostka organizacyjna dokonująca zakupu
-3. Sklep - serwis internetowy dostępny pod adresem foresticksv.com
-
-§3. ZAMÓWIENIA
-1. Zamówienia można składać 24/7 przez stronę internetową.
-2. Zamówienie jest wiążące po otrzymaniu potwierdzenia e-mailem.
-3. Ceny podane są w złotych polskich (PLN) i zawierają podatek VAT.
-
-§4. PŁATNOŚCI
-1. Akceptowane metody płatności: przelew online, BLIK, karty płatnicze, PayPal.
-2. Płatność musi zostać zrealizowana w ciągu 3 dni od złożenia zamówienia.
-3. Nie akceptujemy płatności przy odbiorze.
-
-§5. DOSTAWA
-1. Dostawa realizowana jest na terenie Polski i za granicą.
-2. Szczegóły w zakładce "Polityka wysyłki".
-
-§6. ODSTĄPIENIE OD UMOWY
-1. Klient ma prawo odstąpić od umowy w ciągu 14 dni bez podania przyczyny.
-2. Szczegóły w zakładce "Zwroty".
-
-§7. REKLAMACJE
-1. Reklamacje można zgłaszać w ciągu 14 dni od otrzymania produktu.
-2. Reklamacje rozpatrujemy w ciągu 14 dni.
-3. Gwarancja na produkty wynosi 12 miesięcy.
-
-§8. DANE OSOBOWE
-1. Administratorem danych jest Foresticksv.
-2. Szczegóły w zakładce "Polityka prywatności".
-
-§9. WŁASNOŚĆ INTELEKTUALNA
-1. Wszystkie treści, zdjęcia i projekty są własnością Foresticksv.
-2. Kopiowanie i wykorzystywanie bez zgody jest zabronione.
-
-§10. POSTANOWIENIA KOŃCOWE
-1. Regulamin jest zgodny z polskim prawem.
-2. W sprawach spornych właściwy jest Sąd Rejonowy w Rzeszowie.
-3. Sklep zastrzega sobie prawo do zmiany regulaminu.`,
-
-        'help': `🆘 CENTRUM POMOCY - FORESTICKSV
-
-WITAJ W CENTRUM POMOCY!
-Znajdziesz tu odpowiedzi na najczęściej zadawane pytania.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. JAK ZŁOŻYĆ ZAMÓWIENIE?
-① Wybierz interesujący Cię produkt
-② Kliknij "DODAJ DO KOSZYKA"
-③ Wybierz rozmiar
-④ Przejdź do koszyka (ikona 🛒)
-⑤ Kliknij "FINALIZACJA"
-⑥ Wypełnij formularz
-⑦ Wybierz metodę płatności i dostawy
-⑧ Kliknij "ZAMÓW I ZAPŁAĆ"
-⑨ Otrzymasz e-mail z potwierdzeniem
-
-2. JAKIE SĄ METODY PŁATNOŚCI?
-• Przelew online (Przelewy24)
-• BLIK
-• Karty płatnicze (Visa, Mastercard)
-• PayPal
-Wszystkie płatności są bezpieczne i szyfrowane.
-
-3. CZY MOGĘ ZAPŁACIĆ PRZY ODBIORZE?
-Nie. Akceptujemy tylko płatności online.
-
-4. JAK DŁUGO TRWA DOSTAWA?
-• Polska: 1-3 dni robocze
-• Europa: 5-10 dni roboczych
-• Świat: 10-21 dni roboczych
-
-5. CZY MOGĘ ZWRÓCIĆ PRODUKT?
-Tak! Masz 14 dni na odstąpienie od umowy.
-Szczegóły w zakładce "Zwroty".
-
-6. GDZIE JEST ODBIÓR OSOBISTY?
-Rzeszów, ul. 3 Maja 15, 35-030
-Poniedziałek - Piątek, 10:00-18:00
-Po złożeniu zamówienia otrzymasz e-mail gdy będzie gotowe do odbioru.
-
-7. NIE OTRZYMAŁEM POTWIERDZENIA
-Sprawdź folder SPAM w swojej skrzynce e-mail.
-Jeśli nadal nie ma, napisz na foresticksv@gmail.com
-
-8. ZMIANA ROZMIARU PO ZAMÓWIENIU
-Napisz do nas jak najszybciej na foresticksv@gmail.com
-Jeśli zamówienie nie zostało jeszcze wysłane, zmienimy rozmiar.
-
-9. JAK ŚLEDZIĆ PRZESYŁKĘ?
-Numer śledzenia wysyłamy e-mailem po nadaniu paczki.
-Możesz śledzić przesyłkę na stronie przewoźnika.
-
-10. RABAT NA PIERWSZE ZAKUPY
-Zapisz się do newslettera na dole strony!
-Otrzymasz kod rabatowy -10% na pierwsze zamówienie.
-
-11. JAK SKONTAKTOWAĆ SIĘ Z OBSŁUGĄ?
-• E-mail: foresticksv@gmail.com
-• Instagram: @foresticksvv
-• TikTok: @foresticksv
-• Telefon: +48 123 456 789 (Pon-Pt, 10:00-18:00)
-
-12. ROZMIARÓWKA
-Sprawdź tabelę rozmiarów na stronie każdego produktu.
-W razie wątpliwości napisz do nas - pomożemy wybrać!
-
-13. CZY PRODUKTY SĄ ORYGINALNE?
-Tak! Wszystkie produkty Foresticksv są projektowane i produkowane przez nas.
-
-14. OUT OF STOCK - KIEDY BĘDZIE DOSTĘPNE?
-Napisz do nas! Poinformujemy Cię, kiedy produkt wróci do sprzedaży.
-
-15. WSPÓŁPRACA / COLLAB
-Jesteś artystą, influencerem, fotografem?
-Napisz na foresticksv@gmail.com - jesteśmy otwarci na współpracę!`,
-
-        'contact': `📞 KONTAKT - FORESTICKSV
-
-SKONTAKTUJ SIĘ Z NAMI!
-Jesteśmy do Twojej dyspozycji od poniedziałku do piątku w godzinach 10:00-18:00.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📍 ADRES
-Foresticksv
-ul. 3 Maja 15
-35-030 Rzeszów
-Polska
-
-📧 E-MAIL
-foresticksv@gmail.com
-(Odpowiadamy w ciągu 24h)
-
-📱 TELEFON
-+48 123 456 789
-(Pon-Pt, 10:00-18:00)
-
-📸 SOCIAL MEDIA
-Instagram: @foresticksvv
-TikTok: @foresticksv
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🏢 DANE FIRMY
-NIP: 1234567890
-REGON: 123456789
-
-🕐 GODZINY OTWARCIA
-Poniedziałek - Piątek: 10:00 - 18:00
-Sobota: Nieczynne
-Niedziela: Nieczynne
-
-📦 ZWROTY I REKLAMACJE
-Foresticksv
-ul. 3 Maja 15
-35-030 Rzeszów
-(z dopiskiem "ZWROT")
-
-💬 CHATBOT 24/7
-Nasz chatbot jest dostępny całą dobę!
-Znajdziesz go w prawym dolnym rogu strony.
-
-🗺️ JAK DOJECHAĆ?
-Znajdujemy się w centrum Rzeszowa, przy ul. 3 Maja 15.
-Przystanek autobusowy: 3 Maja (linie 1, 2, 5, 10)
-Parking: dostępny na ulicy (strefa płatnego parkowania)
-
-❓ NAJCZĘŚCIEJ ZADAWANE PYTANIA
-Sprawdź zakładkę "Centrum Pomocy" - znajdziesz tam odpowiedzi na większość pytań!`,
-
-        'imprint': `🏢 IMPRINT - FORESTICKSV
-
-DANE FIRMY I INFORMACJE PRAWNE
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-NAZWA FIRMY
-Foresticksv
-
-ADRES SIEDZIBY
-ul. 3 Maja 15
-35-030 Rzeszów
-Polska
-
-KONTAKT
-E-mail: foresticksv@gmail.com
-Telefon: +48 123 456 789
-
-IDENTYFIKACJA PODATKOWA
-NIP: 1234567890
-REGON: 123456789
-
-FORMA PRAWNA
-Działalność gospodarcza (osoba fizyczna)
-
-WŁAŚCICIEL
-Jan Kowalski
-
-NUMER KONTA BANKOWEGO
-PL 12 1234 5678 9012 3456 7890 1234
-mBank
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SĄD WŁAŚCIWY
-Sąd Rejonowy w Rzeszowie
-
-ODPOWIEDZIALNY ZA TREŚĆ
-Jan Kowalski
-ul. 3 Maja 15, 35-030 Rzeszów
-
-PRAWA AUTORSKIE
-Wszystkie zdjęcia, opisy produktów, grafiki i logo zamieszczone na stronie są własnością Foresticksv i podlegają ochronie prawa autorskiego.
-
-Kopiowanie, rozpowszechnianie i wykorzystywanie bez pisemnej zgody właściciela jest zabronione.
-
-GWARANCJA
-Wszystkie produkty objęte są 12-miesięczną gwarancją.
-
-ZWROTY
-Zgodnie z prawem konsumenckim, klient ma 14 dni na odstąpienie od umowy.
-
-RODO
-Pełna polityka prywatności dostępna w zakładce "Polityka prywatności".
-
-REGULAMIN
-Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-© 2025 Foresticksv. Wszelkie prawa zastrzeżone.`
-    };
-    return policies[type] || "Treść niedostępna. Skontaktuj się z nami: forestickv@gmail.com";
-}
-
+        // ========== POLITYKI ==========
+        function generatePolicyText(type) {
+            const policies = {
+                'shipping': `🚚 POLITYKA WYSYŁKI - FORESTICKSV\n\n1. CZAS REALIZACJI ZAMÓWIENIA\nWszystkie zamówienia są realizowane w ciągu 24-48 godzin od momentu zaksięgowania wpłaty. W przypadku zamówień złożonych w weekendy i święta, realizacja rozpoczyna się następnego dnia roboczego.\n\n2. KOSZTY DOSTAWY\n• Kurier DPD - 15 zł (dostawa 1-2 dni robocze)\n• Paczkomat InPost - 12 zł (dostawa 1-2 dni robocze)\n• Odbiór osobisty - 0 zł (Rzeszów, ul. 3 Maja 15)\n\n3. DARMOWA DOSTAWA\nDarmowa dostawa obowiązuje przy zamówieniach powyżej 500 zł. Dotyczy tylko przesyłek na terenie Polski.\n\n4. CZAS DOSTAWY\n• Polska: 1-3 dni robocze\n• Europa: 5-10 dni roboczych\n• Reszta świata: 10-21 dni roboczych\n\n5. ODBIÓR OSOBISTY\nAdres: Rzeszów, ul. 3 Maja 15, 35-030\nGodziny odbioru: Poniedziałek - Piątek, 10:00-18:00\nPo złożeniu zamówienia otrzymasz e-mail z potwierdzeniem gotowości do odbioru.\n\n6. WYSYŁKA MIĘDZYNARODOWA\nKoszt wysyłki międzynarodowej jest ustalany indywidualnie. Skontaktuj się z nami przed złożeniem zamówienia: foresticksv@gmail.com\n\n7. ŚLEDZENIE PRZESYŁKI\nKażde zamówienie otrzymuje unikalny numer śledzenia. Numer wysyłamy e-mailem natychmiast po nadaniu paczki.\n\n8. PAKOWANIE\nWszystkie produkty są starannie pakowane w specjalne opakowania ochronne, aby zapewnić bezpieczeństwo podczas transportu.\n\n9. BRAK TOWARU\nW przypadku braku zamówionego produktu w magazynie, informujemy o tym w ciągu 24 godzin i proponujemy alternatywne rozwiązanie.\n\n10. ODPOWIEDZIALNOŚĆ\nNie odpowiadamy za opóźnienia spowodowane przez firmy kurierskie. W przypadku zagubienia paczki, rozpoczynamy procedurę reklamacyjną u przewoźnika.`,
+                'returns': `🔄 POLITYKA ZWROTÓW - FORESTICKSV\n\n1. PRAWO ODSTĄPIENIA OD UMOWY\nZgodnie z polskim prawem, masz prawo odstąpić od umowy bez podania przyczyny w ciągu 14 dni od daty otrzymania zamówienia.\n\n2. WARUNKI ZWROTU\n• Produkt musi być w oryginalnym stanie, nieużywany\n• Wszystkie metki i oznaczenia muszą być nienaruszone\n• Produkt musi być zwrócony w oryginalnym opakowaniu\n\n3. KOSZTY ZWROTU\nKoszty odesłania produktu ponosi klient. W przypadku wymiany na inny rozmiar, koszt wysyłki nowego produktu pokrywa sklep.\n\n4. JAK ZGŁOSIĆ ZWROT?\nWyślij e-mail na adres: foresticksv@gmail.com\nW treści podaj:\n• Numer zamówienia\n• Nazwę produktu\n• Powód zwrotu (opcjonalnie)\n\n5. ZWROT PŁATNOŚCI\nPo otrzymaniu i sprawdzeniu zwróconego produktu, środki zostaną zwrócone w ciągu 14 dni na konto, z którego dokonano płatności.\n\n6. PRODUKTY NIE PODLEGAJĄCE ZWROTOWI\n• Produkty zniszczone przez klienta\n• Produkty noszące ślady użytkowania\n• Produkty bez oryginalnych metek\n\n7. REKLAMACJE\nW przypadku wady fabrycznej, rozpatrujemy reklamację w ciągu 14 dni. Wymieniamy produkt na nowy lub zwracamy pełną kwotę.\n\n8. WYMIANA NA INNY ROZMIAR\nWymiana na inny rozmiar jest możliwa. Skontaktuj się z nami, a my zarezerwujemy dla Ciebie odpowiedni rozmiar.\n\n9. ADRES DO ZWROTÓW\nForesticksv\nul. 3 Maja 15\n35-030 Rzeszów\n\n10. DOKUMENTY\nDo przesyłki zwrotnej dołącz dowód zakupu (paragon lub potwierdzenie zamówienia).`,
+                'privacy': `🔒 POLITYKA PRYWATNOŚCI - FORESTICKSV\n\n1. ADMINISTRATOR DANYCH\nAdministratorem Twoich danych osobowych jest Foresticksv, z siedzibą przy ul. 3 Maja 15, 35-030 Rzeszów.\n\n2. JAKIE DANE ZBIERAMY?\n• Imię i nazwisko\n• Adres e-mail\n• Adres dostawy\n• Numer telefonu\n• Dane do faktury (opcjonalnie)\n\n3. CEL ZBIERANIA DANYCH\nDane są zbierane wyłącznie w celu:\n• Realizacji zamówień\n• Kontaktu z klientem\n• Wysyłki newslettera (za zgodą)\n• Wystawienia faktury\n\n4. UDOSTĘPNIANIE DANYCH\nNIE sprzedajemy, NIE wynajmujemy i NIE udostępniamy Twoich danych osobowych podmiotom trzecim, z wyjątkiem:\n• Firm kurierskich (w celu dostawy)\n• Operatorów płatności (w celu realizacji płatności)\n\n5. TWOJE PRAWA\nMasz prawo do:\n• Wglądu w swoje dane\n• Poprawiania danych\n• Usunięcia danych ("prawo do bycia zapomnianym")\n• Ograniczenia przetwarzania\n• Przenoszenia danych\n• Wniesienia sprzeciwu\n\n6. COOKIES\nNasza strona używa plików cookies wyłącznie do:\n• Zapamiętania zawartości koszyka\n• Utrzymania sesji użytkownika\n• Zapamiętania preferencji (np. akceptacja RODO)\nNie używamy cookies marketingowych ani śledzących.\n\n7. USUNIĘCIE DANYCH\nAby usunąć swoje dane, wyślij prośbę na adres: foresticksv@gmail.com\nDane zostaną usunięte w ciągu 30 dni.\n\n8. OKRES PRZECHOWYWANIA\nDane przechowujemy przez okres niezbędny do realizacji zamówienia oraz przez okres wymagany przepisami prawa podatkowego (5 lat dla faktur).\n\n9. BEZPIECZEŃSTWO\n• Strona używa szyfrowania SSL/TLS\n• Dane są przechowywane w bezpieczny sposób\n• Regularnie aktualizujemy zabezpieczenia\n\n10. NARUSZENIE DANYCH\nW przypadku naruszenia ochrony danych, poinformujemy Cię w ciągu 72 godzin od wykrycia incydentu.`,
+                'terms': `📜 REGULAMIN SKLEPU - FORESTICKSV\n\n§1. POSTANOWIENIA OGÓLNE\n1. Niniejszy regulamin określa zasady korzystania ze sklepu internetowego Foresticksv.\n2. Sklep jest własnością: Foresticksv, ul. 3 Maja 15, 35-030 Rzeszów.\n3. Kontakt: foresticksv@gmail.com, tel. +48 123 456 789.\n\n§2. DEFINICJE\n1. Sprzedawca - Foresticksv\n2. Klient - osoba fizyczna, prawna lub jednostka organizacyjna dokonująca zakupu\n3. Sklep - serwis internetowy dostępny pod adresem foresticksv.com\n\n§3. ZAMÓWIENIA\n1. Zamówienia można składać 24/7 przez stronę internetową.\n2. Zamówienie jest wiążące po otrzymaniu potwierdzenia e-mailem.\n3. Ceny podane są w złotych polskich (PLN) i zawierają podatek VAT.\n\n§4. PŁATNOŚCI\n1. Akceptowane metody płatności: przelew online, BLIK, karty płatnicze, PayPal.\n2. Płatność musi zostać zrealizowana w ciągu 3 dni od złożenia zamówienia.\n3. Nie akceptujemy płatności przy odbiorze.\n\n§5. DOSTAWA\n1. Dostawa realizowana jest na terenie Polski i za granicą.\n2. Szczegóły w zakładce "Polityka wysyłki".\n\n§6. ODSTĄPIENIE OD UMOWY\n1. Klient ma prawo odstąpić od umowy w ciągu 14 dni bez podania przyczyny.\n2. Szczegóły w zakładce "Zwroty".\n\n§7. REKLAMACJE\n1. Reklamacje można zgłaszać w ciągu 14 dni od otrzymania produktu.\n2. Reklamacje rozpatrujemy w ciągu 14 dni.\n3. Gwarancja na produkty wynosi 12 miesięcy.\n\n§8. DANE OSOBOWE\n1. Administratorem danych jest Foresticksv.\n2. Szczegóły w zakładce "Polityka prywatności".\n\n§9. WŁASNOŚĆ INTELEKTUALNA\n1. Wszystkie treści, zdjęcia i projekty są własnością Foresticksv.\n2. Kopiowanie i wykorzystywanie bez zgody jest zabronione.\n\n§10. POSTANOWIENIA KOŃCOWE\n1. Regulamin jest zgodny z polskim prawem.\n2. W sprawach spornych właściwy jest Sąd Rejonowy w Rzeszowie.\n3. Sklep zastrzega sobie prawo do zmiany regulaminu.`,
+                'help': `🆘 CENTRUM POMOCY - FORESTICKSV\n\nWITAJ W CENTRUM POMOCY!\nZnajdziesz tu odpowiedzi na najczęściej zadawane pytania.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. JAK ZŁOŻYĆ ZAMÓWIENIE?\n① Wybierz interesujący Cię produkt\n② Kliknij "DODAJ DO KOSZYKA"\n③ Wybierz rozmiar\n④ Przejdź do koszyka (ikona 🛒)\n⑤ Kliknij "FINALIZACJA"\n⑥ Wypełnij formularz\n⑦ Wybierz metodę płatności i dostawy\n⑧ Kliknij "ZAMÓW I ZAPŁAĆ"\n⑨ Otrzymasz e-mail z potwierdzeniem\n\n2. JAKIE SĄ METODY PŁATNOŚCI?\n• Przelew online (Przelewy24)\n• BLIK\n• Karty płatnicze (Visa, Mastercard)\n• PayPal\nWszystkie płatności są bezpieczne i szyfrowane.\n\n3. CZY MOGĘ ZAPŁACIĆ PRZY ODBIORZE?\nNie. Akceptujemy tylko płatności online.\n\n4. JAK DŁUGO TRWA DOSTAWA?\n• Polska: 1-3 dni robocze\n• Europa: 5-10 dni roboczych\n• Świat: 10-21 dni roboczych\n\n5. CZY MOGĘ ZWRÓCIĆ PRODUKT?\nTak! Masz 14 dni na odstąpienie od umowy.\nSzczegóły w zakładce "Zwroty".\n\n6. GDZIE JEST ODBIÓR OSOBISTY?\nRzeszów, ul. 3 Maja 15, 35-030\nPoniedziałek - Piątek, 10:00-18:00\nPo złożeniu zamówienia otrzymasz e-mail gdy będzie gotowe do odbioru.\n\n7. NIE OTRZYMAŁEM POTWIERDZENIA\nSprawdź folder SPAM w swojej skrzynce e-mail.\nJeśli nadal nie ma, napisz na foresticksv@gmail.com\n\n8. ZMIANA ROZMIARU PO ZAMÓWIENIU\nNapisz do nas jak najszybciej na foresticksv@gmail.com\nJeśli zamówienie nie zostało jeszcze wysłane, zmienimy rozmiar.\n\n9. JAK ŚLEDZIĆ PRZESYŁKĘ?\nNumer śledzenia wysyłamy e-mailem po nadaniu paczki.\nMożesz śledzić przesyłkę na stronie przewoźnika.\n\n10. RABAT NA PIERWSZE ZAKUPY\nZapisz się do newslettera na dole strony!\nOtrzymasz kod rabatowy -10% na pierwsze zamówienie.\n\n11. JAK SKONTAKTOWAĆ SIĘ Z OBSŁUGĄ?\n• E-mail: foresticksv@gmail.com\n• Instagram: @foresticksvv\n• TikTok: @foresticksv\n• Telefon: +48 123 456 789 (Pon-Pt, 10:00-18:00)\n\n12. ROZMIARÓWKA\nSprawdź tabelę rozmiarów na stronie każdego produktu.\nW razie wątpliwości napisz do nas - pomożemy wybrać!\n\n13. CZY PRODUKTY SĄ ORYGINALNE?\nTak! Wszystkie produkty Foresticksv są projektowane i produkowane przez nas.\n\n14. OUT OF STOCK - KIEDY BĘDZIE DOSTĘPNE?\nNapisz do nas! Poinformujemy Cię, kiedy produkt wróci do sprzedaży.\n\n15. WSPÓŁPRACA / COLLAB\nJesteś artystą, influencerem, fotografem?\nNapisz na foresticksv@gmail.com - jesteśmy otwarci na współpracę!`,
+                'contact': `📞 KONTAKT - FORESTICKSV\n\nSKONTAKTUJ SIĘ Z NAMI!\nJesteśmy do Twojej dyspozycji od poniedziałku do piątku w godzinach 10:00-18:00.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📍 ADRES\nForesticksv\nul. 3 Maja 15\n35-030 Rzeszów\nPolska\n\n📧 E-MAIL\nforesticksv@gmail.com\n(Odpowiadamy w ciągu 24h)\n\n📱 TELEFON\n+48 123 456 789\n(Pon-Pt, 10:00-18:00)\n\n📸 SOCIAL MEDIA\nInstagram: @foresticksvv\nTikTok: @foresticksv\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🏢 DANE FIRMY\nNIP: 1234567890\nREGON: 123456789\n\n🕐 GODZINY OTWARCIA\nPoniedziałek - Piątek: 10:00 - 18:00\nSobota: Nieczynne\nNiedziela: Nieczynne\n\n📦 ZWROTY I REKLAMACJE\nForesticksv\nul. 3 Maja 15\n35-030 Rzeszów\n(z dopiskiem "ZWROT")\n\n💬 CHATBOT 24/7\nNasz chatbot jest dostępny całą dobę!\nZnajdziesz go w prawym dolnym rogu strony.\n\n🗺️ JAK DOJECHAĆ?\nZnajdujemy się w centrum Rzeszowa, przy ul. 3 Maja 15.\nPrzystanek autobusowy: 3 Maja (linie 1, 2, 5, 10)\nParking: dostępny na ulicy (strefa płatnego parkowania)\n\n❓ NAJCZĘŚCIEJ ZADAWANE PYTANIA\nSprawdź zakładkę "Centrum Pomocy" - znajdziesz tam odpowiedzi na większość pytań!`,
+                'imprint': `🏢 IMPRINT - FORESTICKSV\n\nDANE FIRMY I INFORMACJE PRAWNE\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nNAZWA FIRMY\nForesticksv\n\nADRES SIEDZIBY\nul. 3 Maja 15\n35-030 Rzeszów\nPolska\n\nKONTAKT\nE-mail: foresticksv@gmail.com\nTelefon: +48 123 456 789\n\nIDENTYFIKACJA PODATKOWA\nNIP: 1234567890\nREGON: 123456789\n\nFORMA PRAWNA\nDziałalność gospodarcza (osoba fizyczna)\n\nWŁAŚCICIEL\nJan Kowalski\n\nNUMER KONTA BANKOWEGO\nPL 12 1234 5678 9012 3456 7890 1234\nmBank\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nSĄD WŁAŚCIWY\nSąd Rejonowy w Rzeszowie\n\nODPOWIEDZIALNY ZA TREŚĆ\nJan Kowalski\nul. 3 Maja 15, 35-030 Rzeszów\n\nPRAWA AUTORSKIE\nWszystkie zdjęcia, opisy produktów, grafiki i logo zamieszczone na stronie są własnością Foresticksv i podlegają ochronie prawa autorskiego.\n\nKopiowanie, rozpowszechnianie i wykorzystywanie bez pisemnej zgody właściciela jest zabronione.\n\nGWARANCJA\nWszystkie produkty objęte są 12-miesięczną gwarancją.\n\nZWROTY\nZgodnie z prawem konsumenckim, klient ma 14 dni na odstąpienie od umowy.\n\nRODO\nPełna polityka prywatności dostępna w zakładce "Polityka prywatności".\n\nREGULAMIN\nPełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n© 2025 Foresticksv. Wszelkie prawa zastrzeżone.`
+            };
+            return policies[type] || "Treść niedostępna. Skontaktuj się z nami: forestickv@gmail.com";
+        }
+
+        // POPRAWIONA FUNKCJA showPolicy
+        function showPolicy(modalId, type, textElementId) {
+            const modal = document.getElementById(modalId);
+            const textElement = document.getElementById(textElementId);
+            
+            if (modal && textElement) {
+                // Wypełnij treść
+                textElement.textContent = generatePolicyText(type);
+                
+                // Pokaż modal
+                modal.classList.add("active");
+                
+                // Podepnij przycisk zamykania
+                const closeBtn = modal.querySelector(".close-policy");
+                if (closeBtn) {
+                    const newCloseBtn = closeBtn.cloneNode(true);
+                    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+                    newCloseBtn.onclick = () => {
+                        modal.classList.remove("active");
+                    };
+                }
+                
+                // Zamknij po kliknięciu poza modalem
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove("active");
+                    }
+                };
+                
+                console.log(`✅ Modal ${modalId} otwarty z treścią: ${type}`);
+            } else {
+                console.error(`❌ Nie można otworzyć modala: ${modalId} lub elementu: ${textElementId}`);
+            }
+        }
 
         // ========== DISPLAY KONTA UŻYTKOWNIKA ==========
         function displayUserOrders() {
@@ -1998,7 +1670,7 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
             console.log("🚀 Inicjalizacja Foresticksv Store...");
 
             // Ładowanie danych
-            loadAllData();
+            await loadAllData();
 
             // Ładowanie koszyka i ostatnio oglądanych
             cart = storageGet("cart") || [];
@@ -2088,10 +1760,10 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
             document.getElementById("closeAccountModal").addEventListener("click", hideAccountModal);
 
             // Event: Login
-            document.getElementById("doLoginBtn").addEventListener("click", () => {
+            document.getElementById("doLoginBtn").addEventListener("click", async () => {
                 let email = document.getElementById("loginEmail").value;
                 let password = document.getElementById("loginPassword").value;
-                let result = loginUser(email, password);
+                let result = await loginUser(email, password);
                 let msgDiv = document.getElementById("authMessage");
                 msgDiv.style.display = "block";
                 msgDiv.style.backgroundColor = result.success ? "#1a3a1a" : "#3a1a1a";
@@ -2107,7 +1779,7 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
             });
 
             // Event: Register
-            document.getElementById("doRegisterBtn").addEventListener("click", () => {
+            document.getElementById("doRegisterBtn").addEventListener("click", async () => {
                 let name = document.getElementById("regName").value;
                 let email = document.getElementById("regEmail").value;
                 let password = document.getElementById("regPassword").value;
@@ -2122,7 +1794,7 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
                     return;
                 }
 
-                let result = registerUser(name, email, password);
+                let result = await registerUser(name, email, password);
                 msgDiv.style.display = "block";
                 msgDiv.style.backgroundColor = result.success ? "#1a3a1a" : "#3a1a1a";
                 msgDiv.style.border = `1px solid ${result.success ? "#00cc00" : "#cc0000"}`;
@@ -2226,7 +1898,6 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
                     items_count: cart.length
                 };
 
-                // Wysyłka emaila (nie blokuje składania zamówienia)
                 sendOrderEmail(orderDetails).then(success => {
                     if (success) {
                         console.log("✅ E-mail z zamówieniem wysłany");
@@ -2235,7 +1906,6 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
                     }
                 });
 
-                // Zapis zamówienia na koncie użytkownika
                 if (currentUser && cart.length > 0) {
                     let orderData = {
                         order_id: orderId,
@@ -2323,15 +1993,103 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
                 btn.addEventListener("click", () => quickAction(btn.dataset.question));
             });
 
-            // Event: Modale polityk
-            document.getElementById("shippingPolicyLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("shippingPolicyModal", "shipping", "shippingPolicyText"); });
-            document.getElementById("returnsPolicyLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("returnsPolicyModal", "returns", "returnsPolicyText"); });
-            document.getElementById("privacyPolicyLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("privacyPolicyModal", "privacy", "privacyPolicyText"); });
-            document.getElementById("termsLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("termsModal", "terms", "termsText"); });
-            document.getElementById("helpCenterLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("helpCenterModal", "help", "helpCenterText"); });
-            document.getElementById("contactFooterLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("contactModal", "contact", "contactText"); });
-            document.getElementById("imprintLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("imprintModal", "imprint", "imprintText"); });
-            document.getElementById("contactAddressLink")?.addEventListener("click", (e) => { e.preventDefault(); showPolicy("contactModal", "contact", "contactText"); });
+            // ========== POPRAWIONE EVENT LISTENERY DLA PRZYCISKÓW W STOPCE ==========
+            
+            // CENTRUM POMOCY
+            const helpCenterLink = document.getElementById("helpCenterLink");
+            if (helpCenterLink) {
+                helpCenterLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("🆘 Kliknięto CENTRUM POMOCY");
+                    showPolicy("helpCenterModal", "help", "helpCenterText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu helpCenterLink");
+            }
+
+            // POLITYKA WYSYŁKI
+            const shippingPolicyLink = document.getElementById("shippingPolicyLink");
+            if (shippingPolicyLink) {
+                shippingPolicyLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("🚚 Kliknięto POLITYKA WYSYŁKI");
+                    showPolicy("shippingPolicyModal", "shipping", "shippingPolicyText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu shippingPolicyLink");
+            }
+
+            // ZWROTY
+            const returnsPolicyLink = document.getElementById("returnsPolicyLink");
+            if (returnsPolicyLink) {
+                returnsPolicyLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("🔄 Kliknięto ZWROTY");
+                    showPolicy("returnsPolicyModal", "returns", "returnsPolicyText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu returnsPolicyLink");
+            }
+
+            // KONTAKT (link w stopce)
+            const contactFooterLink = document.getElementById("contactFooterLink");
+            if (contactFooterLink) {
+                contactFooterLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("📞 Kliknięto KONTAKT");
+                    showPolicy("contactModal", "contact", "contactText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu contactFooterLink");
+            }
+
+            // ADRES (link w stopce)
+            const contactAddressLink = document.getElementById("contactAddressLink");
+            if (contactAddressLink) {
+                contactAddressLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("📍 Kliknięto ADRES");
+                    showPolicy("contactModal", "contact", "contactText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu contactAddressLink");
+            }
+
+            // IMPRINT
+            const imprintLink = document.getElementById("imprintLink");
+            if (imprintLink) {
+                imprintLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("🏢 Kliknięto IMPRINT");
+                    showPolicy("imprintModal", "imprint", "imprintText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu imprintLink");
+            }
+
+            // POLITYKA PRYWATNOŚCI
+            const privacyPolicyLink = document.getElementById("privacyPolicyLink");
+            if (privacyPolicyLink) {
+                privacyPolicyLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("🔒 Kliknięto POLITYKA PRYWATNOŚCI");
+                    showPolicy("privacyPolicyModal", "privacy", "privacyPolicyText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu privacyPolicyLink");
+            }
+
+            // REGULAMIN SKLEPU
+            const termsLink = document.getElementById("termsLink");
+            if (termsLink) {
+                termsLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    console.log("📜 Kliknięto REGULAMIN SKLEPU");
+                    showPolicy("termsModal", "terms", "termsText");
+                });
+            } else {
+                console.error("❌ Nie znaleziono elementu termsLink");
+            }
 
             // Event: Zamykanie modali
             document.querySelectorAll(".close-modal").forEach(btn => {
@@ -2360,8 +2118,9 @@ Pełny regulamin sklepu dostępny w zakładce "Regulamin sklepu".
                 alert("STRONA UZYWA COOKIES DO ZAPAMIETANIA KOSZYKA I SESJI UZYTKOWNIKA.");
             });
 
-            console.log("✅ Inicjalizacja zakończona");
+            console.log("✅ Inicjalizacja zakończona - wszystkie przyciski w stopce są podpięte");
             console.log("👑 Konto admina: " + CONFIG.ADMIN_EMAIL);
+            console.log("🔒 Hasła są hashowane algorytmem SHA-256");
         }
 
         // Uruchom aplikację
